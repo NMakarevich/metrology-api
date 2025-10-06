@@ -60,6 +60,13 @@ category2
 - `POST` - should create new verification
 - `PATCH /:id` - should update verification
 
-9. `/planning`
+9. `/notes`
+
+- `GET` - should return list of all notes
+- `GET /:id` - should return note by id
+- `POST` - should create new note
+- `PATCH /:id` - should update note
+
+10. `/planning`
 
 Possible feature
