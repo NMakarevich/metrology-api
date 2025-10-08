@@ -75,5 +75,12 @@ category2
 - `PATCH /:id` - should update note
 
 10. `/planning`
+10. `/engineer`
+
+- `GET` - should return list of all engineers (only for SUPERUSER and ADMIN)
+- `GET /:id` - should return engineer by id (for authorized user)
+- `POST` - should create new engineer (if it's first - set SUPERUSER, for another - ENGINEER)
+- `PATCH /:id` - should update engineer (according role)
+11. `/planning`
 
 Possible feature
