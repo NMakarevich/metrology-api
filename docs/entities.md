@@ -134,9 +134,20 @@ enum Role {
 
 ```typescript
 type ValidationHistory = {
+  id: string;
   accountNum: string;
   date: number;
+  categoryId: string;
   instrumentIds: string[];
+  status: VALIDATION_STATUS;
+}
+```
+
+```typescript
+enum VALIDATION_STATUS {
+  IN_VALIDATION,
+  PAID,
+  DONE
 }
 ```
 
