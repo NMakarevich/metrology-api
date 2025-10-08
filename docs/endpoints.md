@@ -18,21 +18,28 @@ category2
     ...
 ```
 
-2. `/clinic`
+2. `/address`
+
+- `GET` - should return all addresses
+- `GET /:id` - should return address by id
+- `POST` - should create new address
+- `PATCH /:id` - should update address
+
+3. `/clinic`
 
 - `GET` - should return list of all clinics with presented categories
 - `GET /:id` - should return clinic by id with presented categories
 - `POST` - should create new clinic
 - `PATCH /:id` - should update clinic's fields
 
-3. `/clinic/:clinicId/category`
+4. `/clinic/:clinicId/category`
 
 - `GET` - should return list of all categories for clinicId
 - `GET /:id` - should return category by id
 - `POST` - create new category
 - `PATCH /:id` - update category's fields
 
-4. `/clinic/:clinicId/category/:categoryId/instrument`
+5. `/clinic/:clinicId/category/:categoryId/instrument`
 
 - `GET` - should return list of all instruments for clinicId and categoryId
 - `GET /:id` - should return card for instrument
