@@ -118,7 +118,11 @@ type Engineer = {
   lastName: string;
   login: string;
   password: string;
-  role: Role
+  role: Role;
+  createdAt: number;
+  updatedAt: number;
+  updatedBy: string;
+  version: number
 }
 ```
 
