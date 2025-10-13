@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Engineer, ENGINEER_ROLE } from '../resources/engineer/entities/engineer.entity';
-import { UpdateEngineerDto } from '../resources/engineer/dto/update-engineer.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class EngineersDB {
@@ -10,7 +10,7 @@ export class EngineersDB {
       lastName: 'Makarevich',
       login: 'makarevichna',
       password: 'password',
-      id: '1760372675265',
+      id: uuidv4(),
       createdAt: 1760372675265,
       updatedAt: 1760372675265,
       updatedBy: null,
@@ -22,7 +22,7 @@ export class EngineersDB {
       lastName: 'Makarevich',
       login: 'makarevichna1',
       password: 'password',
-      id: '1760372687871',
+      id: uuidv4(),
       createdAt: 1760372687871,
       updatedAt: 1760372687871,
       updatedBy: null,
