@@ -8,6 +8,7 @@ import {
   HttpException,
   HttpStatus,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   UseInterceptors,
@@ -38,14 +39,14 @@ export class EngineerController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Engineer {
+  findOne(@Param('id', new ParseUUIDPipe()) id: string): Engineer {
     return this.engineerService.findOne(id);
   }
 
   @Roles(ENGINEER_ROLE.ADMIN, ENGINEER_ROLE.ENGINEER)
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateEngineerDto: UpdateEngineerDto,
     @Headers('Authorization') authorization: string,
   ) {
@@ -54,7 +55,7 @@ export class EngineerController {
 
   @Roles(ENGINEER_ROLE.ADMIN)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.engineerService.remove(id);
   }
 }
