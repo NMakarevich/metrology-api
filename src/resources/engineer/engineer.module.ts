@@ -6,5 +6,6 @@ import { EngineersDB } from '../../mock/engineers';
 @Module({
   controllers: [EngineerController],
   providers: [EngineerService, EngineersDB],
+  exports: [EngineerService],
 })
 export class EngineerModule {}

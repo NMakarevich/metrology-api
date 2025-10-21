@@ -3,16 +3,27 @@ import { CreateEngineerDto } from './dto/create-engineer.dto';
 import { UpdateEngineerDto } from './dto/update-engineer.dto';
 import { EngineersDB } from '../../mock/engineers';
 import { Engineer, ENGINEER_ROLE } from './entities/engineer.entity';
+import * as bcrypt from 'bcrypt';
+import 'dotenv/config';
+import * as process from 'node:process';
+import { DEFAULT_SALT_OR_ROUNDS } from './constants';
 
 @Injectable()
 export class EngineerService {
   constructor(private readonly db: EngineersDB) {}
 
-  create(createEngineerDto: CreateEngineerDto) {
+  async create(createEngineerDto: CreateEngineerDto) {
     const date = new Date().getTime();
+
+    const hash = await bcrypt.hash(
+      createEngineerDto.password,
+      Number(process.env.SALT_OR_ROUNDS ?? DEFAULT_SALT_OR_ROUNDS),
+    );
+
     const newEngineer = new Engineer(
       Object.assign({}, createEngineerDto, {
         id: date.toString(),
+        password: hash,
         createdAt: date,
         updatedAt: date,
         updatedBy: null,

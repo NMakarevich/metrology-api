@@ -5,9 +5,10 @@ import { EngineerModule } from './resources/engineer/engineer.module';
 import { RolesGuard } from './guards/roles.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { EngineersDB } from './mock/engineers';
+import { AuthModule } from './resources/auth/auth.module';
 
 @Module({
-  imports: [EngineerModule],
+  imports: [EngineerModule, AuthModule],
   controllers: [AppController],
   providers: [
     AppService,
