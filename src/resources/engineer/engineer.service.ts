@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import 'dotenv/config';
 import * as process from 'node:process';
 import { DEFAULT_SALT_OR_ROUNDS } from './constants';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class EngineerService {
@@ -22,7 +23,7 @@ export class EngineerService {
 
     const newEngineer = new Engineer(
       Object.assign({}, createEngineerDto, {
-        id: date.toString(),
+        id: uuidv4(),
         password: hash,
         createdAt: date,
         updatedAt: date,
