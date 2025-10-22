@@ -1,9 +1,12 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export class BaseDb<T extends { id: string }> {
   private entities = [] as T[];
 
-  create(entity: T) {
-    this.entities.push(entity);
-    return entity;
+  create(createEntityDto: Partial<T>): T {
+    const newEntity = Object.assign({}, createEntityDto, { id: uuidv4() }) as T;
+    this.entities.push(newEntity);
+    return newEntity;
   }
 
   findAll() {
