@@ -6,5 +6,6 @@ import { Addresses } from '../../mock/addresses';
 @Module({
   controllers: [AddressController],
   providers: [AddressService, Addresses],
+  exports: [AddressService],
 })
 export class AddressModule {}

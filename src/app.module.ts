@@ -7,9 +7,10 @@ import { APP_GUARD } from '@nestjs/core';
 import { EngineersDB } from './mock/engineers';
 import { AuthModule } from './resources/auth/auth.module';
 import { AddressModule } from './resources/address/address.module';
+import { ClinicModule } from './resources/clinic/clinic.module';
 
 @Module({
-  imports: [EngineerModule, AuthModule, AddressModule],
+  imports: [EngineerModule, AuthModule, AddressModule, ClinicModule],
   controllers: [AppController],
   providers: [
     AppService,
