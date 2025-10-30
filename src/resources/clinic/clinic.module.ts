@@ -8,5 +8,6 @@ import { AddressModule } from '../address/address.module';
   controllers: [ClinicController],
   providers: [ClinicService, Clinics],
   imports: [AddressModule],
+  exports: [ClinicService],
 })
 export class ClinicModule {}
