@@ -14,11 +14,18 @@ export class CreateClinicDto {
 
   @IsArray()
   contacts: Contact[];
+
+  @IsUUID('4', { each: true })
+  @IsOptional()
+  categoryIds: string[];
 }
 
 export class Contact {
   @IsString()
   fullName: string;
+
+  @IsString()
+  role: string;
 
   @IsString()
   @IsOptional()

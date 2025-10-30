@@ -8,9 +8,10 @@ import { EngineersDB } from './mock/engineers';
 import { AuthModule } from './resources/auth/auth.module';
 import { AddressModule } from './resources/address/address.module';
 import { ClinicModule } from './resources/clinic/clinic.module';
+import { CategoryModule } from './resources/category/category.module';
 
 @Module({
-  imports: [EngineerModule, AuthModule, AddressModule, ClinicModule],
+  imports: [EngineerModule, AuthModule, AddressModule, ClinicModule, CategoryModule],
   controllers: [AppController],
   providers: [
     AppService,
