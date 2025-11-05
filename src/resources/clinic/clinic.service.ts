@@ -36,9 +36,9 @@ export class ClinicService {
     return clinic;
   }
 
-  update(clinicId: string, updateClinicDto: UpdateClinicDto & { id?: string }) {
+  update(clinicId: string, updateClinicDto: UpdateClinicDto) {
     this.checkForExist(clinicId);
-    const { id, addressId, address, ...data } = updateClinicDto;
+    const { addressId, address, ...data } = updateClinicDto;
     if (addressId) {
       return this.clinicsDb.update(clinicId, Object.assign(data, { addressId }));
     } else if (address) {

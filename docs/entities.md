@@ -100,7 +100,7 @@ Relations:
 type Model = {
   id: string;
   name: string;
-  regisryNumber: string;
+  registryNumber: string;
   registryName: string;
   validationPrice: number;
 }
