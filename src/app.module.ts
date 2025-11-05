@@ -12,9 +12,20 @@ import { CategoryModule } from './resources/category/category.module';
 import { InstrumentModule } from './resources/instrument/instrument.module';
 import { VendorModule } from './resources/vendor/vendor.module';
 import { ModelModule } from './resources/model/model.module';
+import { NoteModule } from './resources/note/note.module';
 
 @Module({
-  imports: [EngineerModule, AuthModule, AddressModule, ClinicModule, CategoryModule, InstrumentModule, VendorModule, ModelModule],
+  imports: [
+    EngineerModule,
+    AuthModule,
+    AddressModule,
+    ClinicModule,
+    CategoryModule,
+    InstrumentModule,
+    VendorModule,
+    ModelModule,
+    NoteModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
