@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
 import { ENGINEER_ROLE } from '../entities/engineer.entity';
 
 export class CreateEngineerDto {
