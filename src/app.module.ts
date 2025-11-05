@@ -13,6 +13,7 @@ import { InstrumentModule } from './resources/instrument/instrument.module';
 import { VendorModule } from './resources/vendor/vendor.module';
 import { ModelModule } from './resources/model/model.module';
 import { NoteModule } from './resources/note/note.module';
+import { VerificationModule } from './resources/verification/verification.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { NoteModule } from './resources/note/note.module';
     VendorModule,
     ModelModule,
     NoteModule,
+    VerificationModule,
   ],
   controllers: [AppController],
   providers: [
