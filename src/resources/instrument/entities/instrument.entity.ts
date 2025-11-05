@@ -1,7 +1,7 @@
 export class Instrument {
   id: string;
   serialNumber: string;
-  verificatedAt: number;
+  verifiedAt: number;
   validUntil: number;
   createdAt: number;
   updatedAt: number;

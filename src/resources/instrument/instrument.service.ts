@@ -14,9 +14,21 @@ export class InstrumentService {
     private readonly modelService: ModelService,
   ) {}
 
-  create(clinicId: string, categoryId: string, createInstrumentDto: CreateInstrumentDto) {
-    const newInstrument = new Instrument();
+  create(
+    clinicId: string,
+    categoryId: string,
+    createInstrumentDto: CreateInstrumentDto,
+    engineerId: string,
+  ) {
     const date = new Date().getTime();
+    const newInstrument = Object.assign(new Instrument(), {
+      createdAt: date,
+      updatedAt: date,
+      createdBy: engineerId,
+      updatedBy: engineerId,
+      clinicId,
+      categoryId,
+    });
     const { serialNumber, status, modelId, comment, validUntil, verifiedAt } = createInstrumentDto;
     if (!modelId) {
       const { modelName, vendorName, registryNumber, registryName, validationPrice } =
@@ -36,26 +48,15 @@ export class InstrumentService {
       return this.instrumentsDb.create(
         Object.assign(newInstrument, {
           modelId: newModel.id,
-          createdAt: date,
-          updatedAt: date,
           serialNumber,
           status,
           comment,
           validUntil,
           verifiedAt,
-          clinicId,
-          categoryId,
         }),
       );
     }
-    return this.instrumentsDb.create(
-      Object.assign(newInstrument, createInstrumentDto, {
-        createdAt: date,
-        updatedAt: date,
-        clinicId,
-        categoryId,
-      }),
-    );
+    return this.instrumentsDb.create(Object.assign(newInstrument, createInstrumentDto));
   }
 
   findAll(clinicId: string, categoryId: string) {
@@ -70,9 +71,15 @@ export class InstrumentService {
     return this.instrumentsDb.findOne(id);
   }
 
-  update(instrumentId: string, updateInstrumentDto: UpdateInstrumentDto) {
+  update(instrumentId: string, updateInstrumentDto: UpdateInstrumentDto, engineerId: string) {
     this.checkForExist(instrumentId);
-    return this.instrumentsDb.update(instrumentId, updateInstrumentDto);
+    return this.instrumentsDb.update(
+      instrumentId,
+      Object.assign(updateInstrumentDto, {
+        updatedAt: new Date().getTime(),
+        updatedBy: engineerId,
+      }),
+    );
   }
 
   remove(id: string) {
