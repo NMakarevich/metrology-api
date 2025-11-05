@@ -9,9 +9,12 @@ import { AuthModule } from './resources/auth/auth.module';
 import { AddressModule } from './resources/address/address.module';
 import { ClinicModule } from './resources/clinic/clinic.module';
 import { CategoryModule } from './resources/category/category.module';
+import { InstrumentModule } from './resources/instrument/instrument.module';
+import { VendorModule } from './resources/vendor/vendor.module';
+import { ModelModule } from './resources/model/model.module';
 
 @Module({
-  imports: [EngineerModule, AuthModule, AddressModule, ClinicModule, CategoryModule],
+  imports: [EngineerModule, AuthModule, AddressModule, ClinicModule, CategoryModule, InstrumentModule, VendorModule, ModelModule],
   controllers: [AppController],
   providers: [
     AppService,
