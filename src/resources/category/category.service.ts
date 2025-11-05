@@ -30,10 +30,9 @@ export class CategoryService {
     return this.categoryDb.findOne(id);
   }
 
-  updateName(categoryId: string, updateCategoryNameDto: UpdateCategoryNameDto & { id?: string }) {
+  updateName(categoryId: string, updateCategoryNameDto: UpdateCategoryNameDto) {
     this.checkForExist(categoryId);
-    const { name, id } = updateCategoryNameDto;
-    return this.categoryDb.update(categoryId, { name });
+    return this.categoryDb.update(categoryId, updateCategoryNameDto);
   }
 
   addClinicIds(categoryId: string, updateClinicIds: UpdateClinicIdsDto) {
