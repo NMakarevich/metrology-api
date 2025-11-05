@@ -27,18 +27,18 @@ export class ModelController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.modelService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateModelDto: UpdateModelDto) {
+  update(@Param('id', new ParseUUIDPipe()) id: string, @Body() updateModelDto: UpdateModelDto) {
     return this.modelService.update(id, updateModelDto);
   }
 
   @Roles(ENGINEER_ROLE.ADMIN)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.modelService.remove(id);
   }
 }
