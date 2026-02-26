@@ -3,7 +3,7 @@ import { ModelService } from './model.service';
 import { CreateModelDto } from './dto/create-model.dto';
 import { UpdateModelDto } from './dto/update-model.dto';
 import { Roles } from '../../decorators/roles.decorator';
-import { ENGINEER_ROLE } from '../engineer/entities/engineer.entity';
+import { Role } from '../../../generated/prisma/enums';
 
 @Controller('category/:categoryId/vendor/:vendorId/model')
 export class ModelController {
@@ -36,7 +36,7 @@ export class ModelController {
     return this.modelService.update(id, updateModelDto);
   }
 
-  @Roles(ENGINEER_ROLE.ADMIN)
+  @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.modelService.remove(id);

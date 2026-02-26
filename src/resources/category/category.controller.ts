@@ -3,7 +3,7 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryNameDto } from './dto/update-category-name.dto';
 import { Roles } from '../../decorators/roles.decorator';
-import { ENGINEER_ROLE } from '../engineer/entities/engineer.entity';
+import { Role } from '../../../generated/prisma/enums';
 import { UpdateClinicIdsDto } from './dto/update-clinic-ids.dto';
 
 @Controller('category')
@@ -49,7 +49,7 @@ export class CategoryController {
     return this.categoryService.removeClinicIds(id, removeClinicDto);
   }
 
-  @Roles(ENGINEER_ROLE.ADMIN)
+  @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.categoryService.remove(id);

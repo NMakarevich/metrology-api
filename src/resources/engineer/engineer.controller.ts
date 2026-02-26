@@ -17,14 +17,15 @@ import { EngineerService } from './engineer.service';
 import { CreateEngineerDto } from './dto/create-engineer.dto';
 import { UpdateEngineerDto } from './dto/update-engineer.dto';
 import { Roles } from '../../decorators/roles.decorator';
-import { Engineer, ENGINEER_ROLE } from './entities/engineer.entity';
+import { Engineer } from './entities/engineer.entity';
+import { Role } from '../../../generated/prisma/enums';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('engineer')
 export class EngineerController {
   constructor(private readonly engineerService: EngineerService) {}
 
-  @Roles(ENGINEER_ROLE.ADMIN)
+  @Roles(Role.ADMIN)
   @Post()
   create(@Body() createEngineerDto: CreateEngineerDto) {
     const engineer = this.engineerService.findByLogin(createEngineerDto.login);
@@ -34,16 +35,16 @@ export class EngineerController {
   }
 
   @Get()
-  findAll(): Engineer[] {
+  async findAll(): Promise<Engineer[]> {
     return this.engineerService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', new ParseUUIDPipe()) id: string): Engineer {
+  async findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<Engineer> {
     return this.engineerService.findOne(id);
   }
 
-  @Roles(ENGINEER_ROLE.ADMIN, ENGINEER_ROLE.ENGINEER)
+  @Roles(Role.ADMIN, Role.ENGINEER)
   @Patch(':id')
   update(
     @Param('id', new ParseUUIDPipe()) id: string,
@@ -53,7 +54,7 @@ export class EngineerController {
     return this.engineerService.update(id, updateEngineerDto, authorization);
   }
 
-  @Roles(ENGINEER_ROLE.ADMIN)
+  @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.engineerService.remove(id);

@@ -3,7 +3,7 @@ import { VerificationService } from './verification.service';
 import { CreateVerificationDto } from './dto/create-verification.dto';
 import { UpdateVerificationDto } from './dto/update-verification.dto';
 import { Roles } from '../../decorators/roles.decorator';
-import { ENGINEER_ROLE } from '../engineer/entities/engineer.entity';
+import { Role } from '../../../generated/prisma/enums';
 
 @Controller('verification')
 export class VerificationController {
@@ -32,7 +32,7 @@ export class VerificationController {
     return this.verificationService.update(id, updateVerificationDto);
   }
 
-  @Roles(ENGINEER_ROLE.ADMIN)
+  @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.verificationService.remove(id);

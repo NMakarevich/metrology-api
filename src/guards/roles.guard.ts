@@ -1,8 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ENGINEER_ROLE } from '../resources/engineer/entities/engineer.entity';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { EngineersDB } from '../mock/engineers';
+import { Role } from '../../generated/prisma/enums';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -12,7 +12,7 @@ export class RolesGuard implements CanActivate {
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<ENGINEER_ROLE[]>(ROLES_KEY, [
+    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -25,8 +25,7 @@ export class RolesGuard implements CanActivate {
     if (method === 'PATCH') {
       const engineerId = url.split('/').pop();
       const targetEngineer = this.engineersDb.get(engineerId);
-      if (engineer.role === ENGINEER_ROLE.ENGINEER)
-        return targetEngineer.role === ENGINEER_ROLE.ENGINEER;
+      if (engineer.role === Role.ENGINEER) return targetEngineer.role === Role.ENGINEER;
       else return true;
     }
     return requiredRoles.includes(engineer.role);

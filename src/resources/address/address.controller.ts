@@ -3,7 +3,7 @@ import { AddressService } from './address.service';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { Roles } from '../../decorators/roles.decorator';
-import { ENGINEER_ROLE } from '../engineer/entities/engineer.entity';
+import { Role } from '../../../generated/prisma/enums';
 
 @Controller('address')
 export class AddressController {
@@ -29,7 +29,7 @@ export class AddressController {
     return this.addressService.update(id, updateAddressDto);
   }
 
-  @Roles(ENGINEER_ROLE.ADMIN)
+  @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.addressService.remove(id);

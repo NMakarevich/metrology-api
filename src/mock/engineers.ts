@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Engineer, ENGINEER_ROLE } from '../resources/engineer/entities/engineer.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { Role } from '../../generated/prisma/enums';
+import { Engineer } from '../resources/engineer/entities/engineer.entity';
 
 @Injectable()
 export class EngineersDB {
@@ -11,11 +12,11 @@ export class EngineersDB {
       login: 'makarevichna',
       password: '$2b$10$JDzfWasSRPqCzsICKzExGeS/Tr.p5WAYPfoss/GHqs6lLSZMGrT5q',
       id: uuidv4(),
-      createdAt: 1760372675265,
-      updatedAt: 1760372675265,
+      createdAt: '1760372675265',
+      updatedAt: '1760372675265',
       updatedBy: null,
       version: 1,
-      role: ENGINEER_ROLE.ADMIN,
+      role: Role.ADMIN,
     }),
     new Engineer({
       firstName: 'Nikolai',
@@ -23,11 +24,11 @@ export class EngineersDB {
       login: 'makarevichna1',
       password: '$2b$10$JDzfWasSRPqCzsICKzExGeS/Tr.p5WAYPfoss/GHqs6lLSZMGrT5q',
       id: uuidv4(),
-      createdAt: 1760372687871,
-      updatedAt: 1760372687871,
+      createdAt: '1760372687871',
+      updatedAt: '1760372687871',
       updatedBy: null,
       version: 1,
-      role: ENGINEER_ROLE.ENGINEER,
+      role: Role.ENGINEER,
     }),
   ];
 

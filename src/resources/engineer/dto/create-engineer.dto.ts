@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
-import { ENGINEER_ROLE } from '../entities/engineer.entity';
+import { Role } from '../../../../generated/prisma/enums';
 
 export class CreateEngineerDto {
   @IsString()
@@ -19,6 +19,6 @@ export class CreateEngineerDto {
   password: string;
 
   @IsOptional()
-  @IsEnum(ENGINEER_ROLE)
-  role: ENGINEER_ROLE;
+  @IsEnum(Role)
+  role: Role;
 }

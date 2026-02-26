@@ -13,7 +13,7 @@ import { InstrumentService } from './instrument.service';
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
 import { UpdateInstrumentDto } from './dto/update-instrument.dto';
 import { Roles } from '../../decorators/roles.decorator';
-import { ENGINEER_ROLE } from '../engineer/entities/engineer.entity';
+import { Role } from '../../../generated/prisma/enums';
 import { JwtService } from '@nestjs/jwt';
 
 @Controller('clinic/:clinicId/category/:categoryId/instrument')
@@ -57,7 +57,7 @@ export class InstrumentController {
     return this.instrumentService.update(id, updateInstrumentDto, engineerId);
   }
 
-  @Roles(ENGINEER_ROLE.ADMIN)
+  @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.instrumentService.remove(id);

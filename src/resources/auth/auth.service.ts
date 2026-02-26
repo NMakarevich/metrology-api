@@ -12,7 +12,7 @@ export class AuthService {
   ) {}
 
   async validateEngineer(login: string, pass: string): Promise<any> {
-    const engineer = this.engineerService.findByLogin(login);
+    const engineer = await this.engineerService.findByLogin(login);
     if (engineer) {
       const isMatchPasswords = await bcrypt.compare(pass, engineer.password);
       if (!isMatchPasswords) {

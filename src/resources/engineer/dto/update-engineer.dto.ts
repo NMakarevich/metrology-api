@@ -1,7 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateEngineerDto } from './create-engineer.dto';
 import { IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
-import { ENGINEER_ROLE } from '../entities/engineer.entity';
+import { Role } from '../../../../generated/prisma/enums';
 
 export class UpdateEngineerDto extends PartialType(CreateEngineerDto) {
   @IsOptional()
@@ -20,6 +20,6 @@ export class UpdateEngineerDto extends PartialType(CreateEngineerDto) {
   password: string;
 
   @IsOptional()
-  @IsEnum(ENGINEER_ROLE)
-  role: ENGINEER_ROLE;
+  @IsEnum(Role)
+  role: Role;
 }
