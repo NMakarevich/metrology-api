@@ -23,7 +23,7 @@ export class EngineerService {
     const newEngineer = new Engineer(
       Object.assign({}, createEngineerDto, {
         password: hash,
-        updatedBy: null,
+        updatedBy: '',
         role: engineers.length === 0 ? Role.ADMIN : Role.ENGINEER,
       }),
     );
@@ -38,7 +38,7 @@ export class EngineerService {
     return this.prismaService.engineer.findUnique({ where: { id } });
   }
 
-  findByLogin(engineerLogin: string) {
+  async findByLogin(engineerLogin: string) {
     return this.prismaService.engineer.findUnique({ where: { login: engineerLogin } });
   }
 

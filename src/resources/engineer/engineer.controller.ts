@@ -29,6 +29,7 @@ export class EngineerController {
   @Post()
   create(@Body() createEngineerDto: CreateEngineerDto) {
     const engineer = this.engineerService.findByLogin(createEngineerDto.login);
+  async create(@Body() createEngineerDto: CreateEngineerDto) {
     if (engineer)
       throw new HttpException('Engineer with entered login is exist', HttpStatus.CONFLICT);
     return this.engineerService.create(createEngineerDto);
