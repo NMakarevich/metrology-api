@@ -1,50 +1,45 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateEngineerDto } from './dto/create-engineer.dto';
 import { UpdateEngineerDto } from './dto/update-engineer.dto';
-import { EngineersDB } from '../../mock/engineers';
-import { Engineer, ENGINEER_ROLE } from './entities/engineer.entity';
+import { Engineer } from './entities/engineer.entity';
 import * as bcrypt from 'bcrypt';
 import 'dotenv/config';
 import * as process from 'node:process';
 import { DEFAULT_SALT_OR_ROUNDS } from './constants';
-import { v4 as uuidv4 } from 'uuid';
+import { PrismaService } from '../../prisma/prisma.service';
+import { Role } from '../../../generated/prisma/enums';
 
 @Injectable()
 export class EngineerService {
-  constructor(private readonly db: EngineersDB) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async create(createEngineerDto: CreateEngineerDto) {
-    const date = new Date().getTime();
-
     const hash = await bcrypt.hash(
       createEngineerDto.password,
       Number(process.env.SALT_OR_ROUNDS ?? DEFAULT_SALT_OR_ROUNDS),
     );
+    const engineers = await this.findAll();
 
     const newEngineer = new Engineer(
       Object.assign({}, createEngineerDto, {
-        id: uuidv4(),
         password: hash,
-        createdAt: date,
-        updatedAt: date,
         updatedBy: null,
-        version: 1,
-        role: this.findAll().length === 0 ? ENGINEER_ROLE.ADMIN : ENGINEER_ROLE.ENGINEER,
+        role: engineers.length === 0 ? Role.ADMIN : Role.ENGINEER,
       }),
     );
-    return this.db.create(newEngineer);
+    return this.prismaService.engineer.create({ data: newEngineer });
   }
 
   findAll() {
-    return this.db.getAll();
+    return this.prismaService.engineer.findMany();
   }
 
   findOne(id: string) {
-    return this.db.get(id);
+    return this.prismaService.engineer.findUnique({ where: { id } });
   }
 
   findByLogin(engineerLogin: string) {
-    return this.db.getByLogin(engineerLogin);
+    return this.prismaService.engineer.findUnique({ where: { login: engineerLogin } });
   }
 
   update(id: string, updateEngineerDto: UpdateEngineerDto, authorization: string) {
@@ -55,14 +50,12 @@ export class EngineerService {
     }
     const engineer = this.findOne(id);
     const updatedEngineer = Object.assign(engineer, updateEngineerDto, {
-      version: engineer.version + 1,
-      updatedAt: new Date().getTime(),
       updatedBy: authorization,
     });
-    return this.db.update(id, updatedEngineer);
+    return this.prismaService.engineer.update({ where: { id }, data: updatedEngineer });
   }
 
   remove(id: string) {
-    return this.db.delete(id);
+    return this.prismaService.engineer.delete({ where: { id } });
   }
 }

@@ -1,4 +1,5 @@
 import { Exclude } from 'class-transformer';
+import { Role } from '../../../../generated/prisma/enums';
 
 export class Engineer {
   id: string;
@@ -9,19 +10,14 @@ export class Engineer {
   @Exclude()
   password: string;
 
-  role: ENGINEER_ROLE;
+  role: Role;
 
-  createdAt: number;
-  updatedAt: number;
+  createdAt: string | Date;
+  updatedAt: string | Date;
   updatedBy: string | null;
   version: number;
 
   constructor(partial: Partial<Engineer>) {
     Object.assign(this, partial);
   }
-}
-
-export enum ENGINEER_ROLE {
-  ADMIN = 'admin',
-  ENGINEER = 'engineer',
 }
