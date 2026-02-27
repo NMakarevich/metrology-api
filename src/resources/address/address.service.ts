@@ -1,41 +1,41 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
-import { Addresses } from '../../mock/addresses';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class AddressService {
-  constructor(private readonly addressDb: Addresses) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   create(createAddressDto: CreateAddressDto) {
-    return this.addressDb.create(createAddressDto);
+    return this.prismaService.address.create({ data: createAddressDto });
   }
 
   findAll() {
-    return this.addressDb.findAll();
+    return this.prismaService.address.findMany();
   }
 
-  findOne(id: string) {
-    const address = this.addressDb.findOne(id);
+  async findOne(id: string) {
+    const address = await this.prismaService.address.findUnique({ where: { id } });
     if (!address) {
       throw new NotFoundException('Address not found');
     }
     return address;
   }
 
-  update(id: string, updateAddressDto: UpdateAddressDto) {
-    this.checkForExist(id);
+  async update(id: string, updateAddressDto: UpdateAddressDto) {
+    await this.checkForExist(id);
     const { address } = updateAddressDto;
-    return this.addressDb.update(id, { address });
+    return this.prismaService.address.update({ where: { id }, data: address });
   }
 
-  remove(id: string) {
-    this.checkForExist(id);
-    return this.addressDb.delete(id);
+  async remove(id: string) {
+    await this.checkForExist(id);
+    return this.prismaService.address.delete({ where: { id } });
   }
 
-  private checkForExist(id: string) {
-    const address = this.addressDb.findOne(id);
+  private async checkForExist(id: string) {
+    const address = await this.findOne(id);
     if (!address) {
       throw new NotFoundException('Address not found');
     }

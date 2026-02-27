@@ -11,13 +11,13 @@ export class ClinicService {
     private readonly addressService: AddressService,
   ) {}
 
-  create(createClinicDto: CreateClinicDto) {
+  async create(createClinicDto: CreateClinicDto) {
     const { addressId, address, ...data } = createClinicDto;
     if (!addressId && !address) {
       throw new BadRequestException('Select address or enter new address');
     }
     if (!addressId && address) {
-      const newAddress = this.addressService.create({ address });
+      const newAddress = await this.addressService.create({ address });
       return this.clinicsDb.create(Object.assign(data, { addressId: newAddress.id }));
     } else {
       return this.clinicsDb.create(Object.assign(data, { addressId }));
@@ -36,13 +36,13 @@ export class ClinicService {
     return clinic;
   }
 
-  update(clinicId: string, updateClinicDto: UpdateClinicDto) {
+  async update(clinicId: string, updateClinicDto: UpdateClinicDto) {
     this.checkForExist(clinicId);
     const { addressId, address, ...data } = updateClinicDto;
     if (addressId) {
       return this.clinicsDb.update(clinicId, Object.assign(data, { addressId }));
     } else if (address) {
-      const newAddress = this.addressService.create({ address });
+      const newAddress = await this.addressService.create({ address });
       return this.clinicsDb.update(clinicId, Object.assign(data, { addressId: newAddress.id }));
     } else {
       return this.clinicsDb.update(clinicId, data);

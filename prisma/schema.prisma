@@ -30,3 +30,8 @@ enum Role {
   ADMIN
   ENGINEER
 }
+
+model Address {
+  id      String @id @default(uuid())
+  address String
+}
