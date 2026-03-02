@@ -5,8 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider        = "prisma-client"
+  output          = "../generated/prisma"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -32,6 +33,25 @@ enum Role {
 }
 
 model Address {
-  id      String @id @default(uuid())
+  id      String   @id @default(uuid())
   address String
+  Clinic  Clinic[]
+}
+
+model Clinic {
+  id        String    @id @default(uuid())
+  name      String
+  address   Address   @relation(fields: [addressId], references: [id])
+  addressId String
+  contacts  Contact[]
+}
+
+model Contact {
+  id       String  @id @default(uuid())
+  fullName String
+  role     String
+  phone    String?
+  email    String?
+  clinicId String?
+  Clinic   Clinic? @relation(fields: [clinicId], references: [id])
 }

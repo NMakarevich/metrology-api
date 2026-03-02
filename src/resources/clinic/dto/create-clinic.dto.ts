@@ -1,37 +1,23 @@
-import { IsArray, IsEmail, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsArray, IsOptional, IsString, IsUUID, ValidateIf } from 'class-validator';
+import { CreateContactDto } from '../../contact/dto/create-contact.dto';
 
 export class CreateClinicDto {
   @IsString()
   name: string;
 
   @IsUUID()
-  @IsOptional()
+  @ValidateIf((clinic) => !clinic.address)
   addressId: string;
 
   @IsString()
-  @IsOptional()
+  @ValidateIf((clinic) => !clinic.addressId)
   address: string;
 
   @IsArray()
-  contacts: Contact[];
+  @IsOptional()
+  contacts: CreateContactDto[];
 
   @IsUUID('4', { each: true })
   @IsOptional()
   categoryIds: string[];
-}
-
-export class Contact {
-  @IsString()
-  fullName: string;
-
-  @IsString()
-  role: string;
-
-  @IsString()
-  @IsOptional()
-  phone: string;
-
-  @IsOptional()
-  @IsEmail()
-  email: string;
 }

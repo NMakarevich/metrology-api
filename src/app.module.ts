@@ -14,6 +14,7 @@ import { VendorModule } from './resources/vendor/vendor.module';
 import { ModelModule } from './resources/model/model.module';
 import { NoteModule } from './resources/note/note.module';
 import { VerificationModule } from './resources/verification/verification.module';
+import { ContactModule } from './resources/contact/contact.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { VerificationModule } from './resources/verification/verification.module
     ModelModule,
     NoteModule,
     VerificationModule,
+    ContactModule,
   ],
   controllers: [AppController],
   providers: [

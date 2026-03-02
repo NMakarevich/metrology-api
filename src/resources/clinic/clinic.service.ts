@@ -1,35 +1,87 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateClinicDto } from './dto/create-clinic.dto';
 import { UpdateClinicDto } from './dto/update-clinic.dto';
-import { Clinics } from '../../mock/clinics';
 import { AddressService } from '../address/address.service';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class ClinicService {
   constructor(
-    private readonly clinicsDb: Clinics,
+    private readonly prismaService: PrismaService,
     private readonly addressService: AddressService,
   ) {}
 
   async create(createClinicDto: CreateClinicDto) {
-    const { addressId, address, ...data } = createClinicDto;
+    const { addressId, address, contacts, ...data } = createClinicDto;
     if (!addressId && !address) {
       throw new BadRequestException('Select address or enter new address');
     }
-    if (!addressId && address) {
-      const newAddress = await this.addressService.create({ address });
-      return this.clinicsDb.create(Object.assign(data, { addressId: newAddress.id }));
-    } else {
-      return this.clinicsDb.create(Object.assign(data, { addressId }));
+    if (addressId) {
+      return this.prismaService.clinic.create({
+        data: {
+          ...data,
+          address: {
+            connect: {
+              id: addressId,
+            },
+          },
+          contacts: {
+            createMany: {
+              data: contacts,
+            },
+          },
+        },
+      });
+    } else if (address) {
+      return this.prismaService.clinic.create({
+        data: {
+          ...data,
+          address: {
+            create: {
+              address,
+            },
+          },
+          contacts: {
+            createMany: {
+              data: contacts,
+            },
+          },
+        },
+      });
     }
   }
 
   findAll() {
-    return this.clinicsDb.findAll();
+    return this.prismaService.clinic.findMany({
+      include: {
+        contacts: {
+          omit: {
+            clinicId: true,
+          },
+        },
+        address: true,
+      },
+      omit: {
+        addressId: true,
+      },
+    });
   }
 
-  findOne(id: string) {
-    const clinic = this.clinicsDb.findOne(id);
+  async findOne(id: string) {
+    const clinic = await this.prismaService.clinic.findUnique({
+      where: { id },
+      include: {
+        contacts: {
+          omit: {
+            clinicId: true,
+          },
+        },
+        address: true,
+      },
+      omit: {
+        addressId: true,
+      },
+    });
     if (!clinic) {
       throw new NotFoundException('Clinic not found');
     }
@@ -37,25 +89,39 @@ export class ClinicService {
   }
 
   async update(clinicId: string, updateClinicDto: UpdateClinicDto) {
-    this.checkForExist(clinicId);
+    await this.checkForExist(clinicId);
     const { addressId, address, ...data } = updateClinicDto;
     if (addressId) {
-      return this.clinicsDb.update(clinicId, Object.assign(data, { addressId }));
-    } else if (address) {
-      const newAddress = await this.addressService.create({ address });
-      return this.clinicsDb.update(clinicId, Object.assign(data, { addressId: newAddress.id }));
-    } else {
-      return this.clinicsDb.update(clinicId, data);
+      return this.prismaService.clinic.update({
+        where: { id: clinicId },
+        data: {
+          ...data,
+          address: {
+            connectOrCreate: {
+              where: {
+                id: addressId,
+              },
+              create: {
+                address,
+              },
+            },
+          },
+        },
+      });
     }
   }
 
-  remove(id: string) {
-    this.checkForExist(id);
-    return this.clinicsDb.delete(id);
+  async remove(id: string) {
+    await this.checkForExist(id);
+    return this.prismaService.clinic.delete({
+      where: {
+        id,
+      },
+    });
   }
 
-  private checkForExist(id: string) {
-    const clinic = this.clinicsDb.findOne(id);
+  private async checkForExist(id: string) {
+    const clinic = await this.findOne(id);
     if (!clinic) {
       throw new NotFoundException('Clinic not found');
     }
