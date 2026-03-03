@@ -1,15 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateClinicDto } from './dto/create-clinic.dto';
 import { UpdateClinicDto } from './dto/update-clinic.dto';
-import { AddressService } from '../address/address.service';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class ClinicService {
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly addressService: AddressService,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async create(createClinicDto: CreateClinicDto) {
     const { addressId, address, contacts, ...data } = createClinicDto;
