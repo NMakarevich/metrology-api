@@ -1,17 +1,22 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
-import { EngineersDB } from '../mock/engineers';
 import { Role } from '../../generated/prisma/enums';
+import { EngineerService } from '../resources/engineer/engineer.service';
+import { JwtService } from '@nestjs/jwt';
+import 'dotenv/config';
+import * as process from 'node:process';
+import { DEFAULT_JWT_SECRET } from '../resources/auth/constants';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private readonly engineersDb: EngineersDB,
+    private readonly engineerService: EngineerService,
+    private readonly jwt: JwtService,
   ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext) {
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -20,14 +25,23 @@ export class RolesGuard implements CanActivate {
       return true;
     }
     const { authorization } = context.switchToHttp().getRequest().headers;
+    const id = await this.extractId(authorization);
     const { method, url } = context.switchToHttp().getRequest();
-    const engineer = this.engineersDb.get(authorization);
-    if (method === 'PATCH') {
+    const engineer = await this.engineerService.findOne(id);
+    if (method === 'PATCH' || method === 'DELETE') {
       const engineerId = url.split('/').pop();
-      const targetEngineer = this.engineersDb.get(engineerId);
+      const targetEngineer = await this.engineerService.findOne(engineerId);
       if (engineer.role === Role.ENGINEER) return targetEngineer.role === Role.ENGINEER;
       else return true;
     }
     return requiredRoles.includes(engineer.role);
+  }
+
+  private async extractId(authorization: string) {
+    const token = authorization.replace('Bearer ', '');
+    const { sub } = await this.jwt.verify(token, {
+      secret: process.env.JWT_SECRET ?? DEFAULT_JWT_SECRET,
+    });
+    return sub;
   }
 }

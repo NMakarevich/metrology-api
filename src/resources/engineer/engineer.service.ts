@@ -34,8 +34,12 @@ export class EngineerService {
     return this.prismaService.engineer.findMany();
   }
 
-  findOne(id: string) {
-    return this.prismaService.engineer.findUnique({ where: { id } });
+  async findOne(id: string) {
+    const engineer = await this.prismaService.engineer.findUnique({ where: { id } });
+    if (!engineer) {
+      throw new HttpException('Engineer not found', HttpStatus.NOT_FOUND);
+    }
+    return engineer;
   }
 
   async findByLogin(engineerLogin: string) {

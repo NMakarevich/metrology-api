@@ -44,7 +44,7 @@ export class ClinicController {
     return this.clinicService.update(id, updateClinicDto);
   }
 
-  // @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   remove(@Param('id', new ParseUUIDPipe()) id: string) {

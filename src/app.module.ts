@@ -15,6 +15,7 @@ import { ModelModule } from './resources/model/model.module';
 import { NoteModule } from './resources/note/note.module';
 import { VerificationModule } from './resources/verification/verification.module';
 import { ContactModule } from './resources/contact/contact.module';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { ContactModule } from './resources/contact/contact.module';
       useClass: RolesGuard,
     },
     EngineersDB,
+    JwtService,
   ],
 })
 export class AppModule {}

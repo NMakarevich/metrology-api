@@ -5,6 +5,8 @@ import {
   Delete,
   Get,
   Headers,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -49,6 +51,7 @@ export class EngineerController {
     return this.engineerService.update(id, updateEngineerDto, authorization);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id', new ParseUUIDPipe()) id: string) {

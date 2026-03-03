@@ -20,7 +20,6 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
-  @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.CREATED)
   @Post('/registry')
   async registry(@Body() createEngineerDto: CreateEngineerDto) {
