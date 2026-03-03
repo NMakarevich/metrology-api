@@ -27,15 +27,29 @@ export class EngineerService {
         role: engineers.length === 0 ? Role.ADMIN : Role.ENGINEER,
       }),
     );
-    return this.prismaService.engineer.create({ data: newEngineer });
+    return this.prismaService.engineer.create({
+      data: newEngineer,
+      omit: {
+        password: true,
+      },
+    });
   }
 
   findAll() {
-    return this.prismaService.engineer.findMany();
+    return this.prismaService.engineer.findMany({
+      omit: {
+        password: true,
+      },
+    });
   }
 
   async findOne(id: string) {
-    const engineer = await this.prismaService.engineer.findUnique({ where: { id } });
+    const engineer = await this.prismaService.engineer.findUnique({
+      where: { id },
+      omit: {
+        password: true,
+      },
+    });
     if (!engineer) {
       throw new HttpException('Engineer not found', HttpStatus.NOT_FOUND);
     }
@@ -43,7 +57,12 @@ export class EngineerService {
   }
 
   async findByLogin(engineerLogin: string) {
-    return this.prismaService.engineer.findUnique({ where: { login: engineerLogin } });
+    return this.prismaService.engineer.findUnique({
+      where: { login: engineerLogin },
+      omit: {
+        password: true,
+      },
+    });
   }
 
   update(id: string, updateEngineerDto: UpdateEngineerDto, authorization: string) {
@@ -56,7 +75,13 @@ export class EngineerService {
     const updatedEngineer = Object.assign(engineer, updateEngineerDto, {
       updatedBy: authorization,
     });
-    return this.prismaService.engineer.update({ where: { id }, data: updatedEngineer });
+    return this.prismaService.engineer.update({
+      where: { id },
+      data: updatedEngineer,
+      omit: {
+        password: true,
+      },
+    });
   }
 
   remove(id: string) {

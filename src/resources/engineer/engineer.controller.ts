@@ -32,12 +32,12 @@ export class EngineerController {
   }
 
   @Get()
-  async findAll(): Promise<Engineer[]> {
+  async findAll(): Promise<Omit<Engineer, 'password'>[]> {
     return this.engineerService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<Engineer> {
+  async findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<Omit<Engineer, 'password'>> {
     return this.engineerService.findOne(id);
   }
 
