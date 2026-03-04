@@ -59,9 +59,6 @@ export class EngineerService {
   async findByLogin(engineerLogin: string) {
     return this.prismaService.engineer.findUnique({
       where: { login: engineerLogin },
-      omit: {
-        password: true,
-      },
     });
   }
 
