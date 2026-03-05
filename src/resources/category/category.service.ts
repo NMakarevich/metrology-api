@@ -1,64 +1,57 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryNameDto } from './dto/update-category-name.dto';
-import { Categories } from '../../mock/categories';
-import { UpdateClinicIdsDto } from './dto/update-clinic-ids.dto';
-import { ClinicService } from '../clinic/clinic.service';
+import { UpdateCategoryDto } from './dto/update-category.dto';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class CategoryService {
-  constructor(
-    private readonly categoryDb: Categories,
-    private readonly clinicService: ClinicService,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   create(createCategoryDto: CreateCategoryDto) {
-    const newCategory = this.categoryDb.create(createCategoryDto);
-    const { clinicId } = createCategoryDto;
-    if (clinicId) {
-      const clinic = this.clinicService.findOne(clinicId);
-      this.clinicService.update(clinicId, { categoryIds: [...clinic.categoryIds, newCategory.id] });
-    }
-    return newCategory;
+    return this.prismaService.category.create({
+      data: {
+        name: createCategoryDto.name,
+        clinics: {
+          connect: createCategoryDto.clinicIds.map((id) => ({
+            id: id,
+          })),
+        },
+      },
+      include: { clinics: true },
+    });
   }
 
   findAll() {
-    return this.categoryDb.findAll();
+    return this.prismaService.category.findMany({ include: { clinics: true } });
   }
 
   findOne(id: string) {
-    return this.categoryDb.findOne(id);
+    return this.prismaService.category.findUnique({ where: { id }, include: { clinics: true } });
   }
 
-  updateName(categoryId: string, updateCategoryNameDto: UpdateCategoryNameDto) {
-    this.checkForExist(categoryId);
-    return this.categoryDb.update(categoryId, updateCategoryNameDto);
+  async update(categoryId: string, updateCategoryDto: UpdateCategoryDto) {
+    const { name, addClinics, removeClinics } = updateCategoryDto;
+    await this.checkForExist(categoryId);
+    return this.prismaService.category.update({
+      where: { id: categoryId },
+      data: {
+        name,
+        clinics: {
+          connect: addClinics ? addClinics.map((id) => ({ id })) : [],
+          disconnect: removeClinics ? removeClinics.map((id) => ({ id })) : [],
+        },
+      },
+      include: { clinics: true },
+    });
   }
 
-  addClinicIds(categoryId: string, updateClinicIds: UpdateClinicIdsDto) {
-    this.checkForExist(categoryId);
-    const category = this.categoryDb.findOne(categoryId);
-    const set = new Set([...category.clinicIds, ...updateClinicIds.ids]);
-    return this.categoryDb.update(categoryId, { clinicIds: Array.from(set.values()) });
+  async remove(id: string) {
+    await this.checkForExist(id);
+    return this.prismaService.category.delete({ where: { id } });
   }
 
-  removeClinicIds(categoryId: string, updateClinicIds: UpdateClinicIdsDto) {
-    this.checkForExist(categoryId);
-    const category = this.categoryDb.findOne(categoryId);
-    const set = new Set([...category.clinicIds]);
-    for (const id of updateClinicIds.ids) {
-      set.delete(id);
-    }
-    return this.categoryDb.update(categoryId, { clinicIds: Array.from(set.values()) });
-  }
-
-  remove(id: string) {
-    this.checkForExist(id);
-    return this.categoryDb.delete(id);
-  }
-
-  checkForExist(id: string) {
-    const category = this.categoryDb.findOne(id);
+  async checkForExist(id: string) {
+    const category = await this.findOne(id);
     if (!category) {
       throw new NotFoundException(`Category not found`);
     }

@@ -1,10 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryNameDto } from './dto/update-category-name.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Roles } from '../../decorators/roles.decorator';
 import { Role } from '../../../generated/prisma/enums';
-import { UpdateClinicIdsDto } from './dto/update-clinic-ids.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -28,25 +27,9 @@ export class CategoryController {
   @Patch(':id')
   updateName(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() updateCategoryNameDto: UpdateCategoryNameDto,
+    @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
-    return this.categoryService.updateName(id, updateCategoryNameDto);
-  }
-
-  @Patch(':id/add-clinic')
-  addClinic(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() addClinicDto: UpdateClinicIdsDto,
-  ) {
-    return this.categoryService.addClinicIds(id, addClinicDto);
-  }
-
-  @Patch(':id/remove-clinic')
-  removeClinic(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() removeClinicDto: UpdateClinicIdsDto,
-  ) {
-    return this.categoryService.removeClinicIds(id, removeClinicDto);
+    return this.categoryService.update(id, updateCategoryDto);
   }
 
   @Roles(Role.ADMIN)

@@ -29,6 +29,7 @@ export class RolesGuard implements CanActivate {
     const { method, url } = context.switchToHttp().getRequest();
     const engineer = await this.engineerService.findOne(id);
     if (method === 'PATCH' || method === 'DELETE') {
+      //TODO: 'fix getting id'
       const engineerId = url.split('/').pop();
       const targetEngineer = await this.engineerService.findOne(engineerId);
       if (engineer.role === Role.ENGINEER) return targetEngineer.role === Role.ENGINEER;
