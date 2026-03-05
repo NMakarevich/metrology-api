@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateEngineerDto } from './create-engineer.dto';
-import { IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEnum, IsOptional, IsString, MinLength, ValidateIf } from 'class-validator';
 import { Role } from '../../../../generated/prisma/enums';
 
 export class UpdateEngineerDto extends PartialType(CreateEngineerDto) {
@@ -14,10 +14,17 @@ export class UpdateEngineerDto extends PartialType(CreateEngineerDto) {
   @MinLength(2, { message: 'Last name must be at least 2 characters' })
   lastName: string;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
+  @ValidateIf((o) => o.newPassword)
   @MinLength(6, { message: 'Password must be at least 6 characters' })
-  password: string;
+  oldPassword: string;
+
+  @IsString()
+  @IsOptional()
+  @ValidateIf((o) => o.oldPassword)
+  @MinLength(6, { message: 'Password must be at least 6 characters' })
+  newPassword: string;
 
   @IsOptional()
   @IsEnum(Role)

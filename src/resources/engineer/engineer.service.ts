@@ -9,15 +9,14 @@ import { DEFAULT_SALT_OR_ROUNDS } from './constants';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Role } from '../../../generated/prisma/enums';
 
+const BCRYPT_SALT = Number(process.env.SALT_OR_ROUNDS ?? DEFAULT_SALT_OR_ROUNDS);
+
 @Injectable()
 export class EngineerService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createEngineerDto: CreateEngineerDto) {
-    const hash = await bcrypt.hash(
-      createEngineerDto.password,
-      Number(process.env.SALT_OR_ROUNDS ?? DEFAULT_SALT_OR_ROUNDS),
-    );
+    const hash = await bcrypt.hash(createEngineerDto.password, BCRYPT_SALT);
     const engineers = await this.findAll();
 
     const newEngineer = new Engineer(
@@ -46,9 +45,6 @@ export class EngineerService {
   async findOne(id: string) {
     const engineer = await this.prismaService.engineer.findUnique({
       where: { id },
-      omit: {
-        password: true,
-      },
     });
     if (!engineer) {
       throw new HttpException('Engineer not found', HttpStatus.NOT_FOUND);
@@ -69,8 +65,16 @@ export class EngineerService {
         throw new HttpException('Engineer with entered login is exist', HttpStatus.CONFLICT);
     }
     const engineer = await this.findOne(id);
+    if (updateEngineerDto.oldPassword) {
+      const isMatch = await bcrypt.compare(updateEngineerDto.oldPassword, engineer.password);
+      if (!isMatch) {
+        throw new HttpException('Incorrect password', HttpStatus.UNAUTHORIZED);
+      }
+    }
+    const hash = await bcrypt.hash(updateEngineerDto.newPassword, BCRYPT_SALT);
     const updatedEngineer = Object.assign(engineer, updateEngineerDto, {
       updatedBy: authorization,
+      password: hash,
     });
     return this.prismaService.engineer.update({
       where: { id },
