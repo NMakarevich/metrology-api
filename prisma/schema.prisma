@@ -39,11 +39,12 @@ model Address {
 }
 
 model Clinic {
-  id        String    @id @default(uuid())
-  name      String
-  address   Address   @relation(fields: [addressId], references: [id])
-  addressId String
-  contacts  Contact[]
+  id         String     @id @default(uuid())
+  name       String
+  address    Address    @relation(fields: [addressId], references: [id])
+  addressId  String
+  contacts   Contact[]
+  categories Category[]
 }
 
 model Contact {
@@ -54,4 +55,10 @@ model Contact {
   email    String?
   clinicId String?
   Clinic   Clinic? @relation(fields: [clinicId], references: [id])
+}
+
+model Category {
+  id      String   @id @default(uuid())
+  name    String
+  clinics Clinic[]
 }
