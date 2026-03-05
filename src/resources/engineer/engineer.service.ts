@@ -74,7 +74,7 @@ export class EngineerService {
     });
     return this.prismaService.engineer.update({
       where: { id },
-      data: updatedEngineer,
+      data: { ...updatedEngineer, version: { increment: 1 } },
       omit: {
         password: true,
       },
