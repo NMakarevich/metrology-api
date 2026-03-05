@@ -61,4 +61,12 @@ model Category {
   id      String   @id @default(uuid())
   name    String
   clinics Clinic[]
+  Vendor  Vendor[]
+}
+
+model Vendor {
+  id         String    @id @default(uuid())
+  name       String
+  categoryId String?
+  Category   Category? @relation(fields: [categoryId], references: [id])
 }

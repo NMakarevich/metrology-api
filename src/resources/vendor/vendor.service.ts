@@ -1,37 +1,37 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
-import { Vendors } from '../../mock/vendors';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class VendorService {
-  constructor(private readonly vendorsDb: Vendors) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   create(createVendorDto: CreateVendorDto) {
-    return this.vendorsDb.create(createVendorDto);
+    return this.prismaService.vendor.create({ data: createVendorDto });
   }
 
   findAll(categoryId: string) {
-    return this.vendorsDb.findAll().filter((vendor) => vendor.categoryId === categoryId);
+    return this.prismaService.vendor.findMany({ where: { categoryId } });
   }
 
-  findOne(id: string) {
-    this.checkForExist(id);
-    return this.vendorsDb.findOne(id);
+  async findOne(id: string) {
+    await this.checkForExist(id);
+    return this.prismaService.vendor.findUnique({ where: { id } });
   }
 
-  update(vendorId: string, updateVendorDto: UpdateVendorDto) {
-    this.checkForExist(vendorId);
-    return this.vendorsDb.update(vendorId, updateVendorDto);
+  async update(vendorId: string, updateVendorDto: UpdateVendorDto) {
+    await this.checkForExist(vendorId);
+    return this.prismaService.vendor.update({ where: { id: vendorId }, data: updateVendorDto });
   }
 
-  remove(id: string) {
-    this.checkForExist(id);
-    return this.vendorsDb.delete(id);
+  async remove(id: string) {
+    await this.checkForExist(id);
+    return this.prismaService.vendor.delete({ where: { id } });
   }
 
-  private checkForExist(vendorId: string) {
-    const vendor = this.vendorsDb.findOne(vendorId);
+  private async checkForExist(vendorId: string) {
+    const vendor = await this.prismaService.vendor.findUnique({ where: { id: vendorId } });
     if (!vendor) throw new NotFoundException('Vendor not found');
   }
 }
