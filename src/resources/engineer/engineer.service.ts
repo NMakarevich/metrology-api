@@ -62,13 +62,13 @@ export class EngineerService {
     });
   }
 
-  update(id: string, updateEngineerDto: UpdateEngineerDto, authorization: string) {
+  async update(id: string, updateEngineerDto: UpdateEngineerDto, authorization: string) {
     if (updateEngineerDto.login) {
-      const engineer = this.findByLogin(updateEngineerDto.login);
+      const engineer = await this.findByLogin(updateEngineerDto.login);
       if (engineer)
         throw new HttpException('Engineer with entered login is exist', HttpStatus.CONFLICT);
     }
-    const engineer = this.findOne(id);
+    const engineer = await this.findOne(id);
     const updatedEngineer = Object.assign(engineer, updateEngineerDto, {
       updatedBy: authorization,
     });

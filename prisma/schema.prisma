@@ -24,7 +24,7 @@ model Engineer {
   updatedAt DateTime @updatedAt
   role      Role
   updatedBy String
-  version   Int      @default(autoincrement())
+  version   Int      @default(1)
 }
 
 enum Role {
