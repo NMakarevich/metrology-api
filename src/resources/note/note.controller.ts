@@ -8,6 +8,8 @@ import {
   Delete,
   Headers,
   ParseUUIDPipe,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { NoteService } from './note.service';
 import { CreateNoteDto } from './dto/create-note.dto';
@@ -28,8 +30,9 @@ export class NoteController {
   }
 
   @Get()
-  findAll() {
-    return this.noteService.findAll();
+  findAll(@Headers('Authorization') authorization: string) {
+    const engineerId = this.extractEngineerIdFromToken(authorization);
+    return this.noteService.findAll(engineerId);
   }
 
   @Get(':id')
@@ -47,6 +50,7 @@ export class NoteController {
     return this.noteService.update(id, updateNoteDto, engineerId);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.noteService.remove(id);

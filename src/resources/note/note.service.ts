@@ -1,40 +1,43 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
-import { Notes } from '../../mock/notes';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class NoteService {
-  constructor(private readonly notesDb: Notes) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   create(createNoteDto: CreateNoteDto, engineerId: string) {
-    const date = new Date().getTime();
-    return this.notesDb.create(
-      Object.assign(createNoteDto, {
-        createdAt: date,
-        updatedAt: date,
-        createdBy: engineerId,
-        updatedBy: engineerId,
-      }),
-    );
+    return this.prismaService.note.create({
+      data: { ...createNoteDto, engineer: { connect: { id: engineerId } } },
+      include: {
+        engineer: true,
+      },
+    });
   }
 
-  findAll() {
-    return this.notesDb.findAll();
+  findAll(engineerId: string) {
+    return this.prismaService.note.findMany({
+      where: { engineerId },
+      include: {
+        engineer: true,
+      },
+    });
   }
 
   findOne(id: string) {
-    return this.notesDb.findOne(id);
+    return this.prismaService.note.findUnique({ where: { id } });
   }
 
-  update(id: string, updateNoteDto: UpdateNoteDto, engineerId: string) {
-    return this.notesDb.update(
-      id,
-      Object.assign(updateNoteDto, { updatedBy: engineerId, updatedAt: new Date().getTime() }),
-    );
+  async update(id: string, updateNoteDto: UpdateNoteDto, engineerId: string) {
+    const note = await this.findOne(id);
+    if (note.engineerId !== engineerId) {
+      throw new UnauthorizedException();
+    }
+    return this.prismaService.note.update({ where: { id }, data: updateNoteDto });
   }
 
   remove(id: string) {
-    return this.notesDb.delete(id);
+    return this.prismaService.note.delete({ where: { id } });
   }
 }

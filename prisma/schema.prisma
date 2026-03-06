@@ -25,6 +25,7 @@ model Engineer {
   role      Role
   updatedBy String
   version   Int      @default(1)
+  Note      Note[]
 }
 
 enum Role {
@@ -110,4 +111,14 @@ enum Status {
   LOST
   INVALID
   CANCELED
+}
+
+model Note {
+  id          String    @id @default(uuid())
+  name        String
+  description String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  engineer    Engineer? @relation(fields: [engineerId], references: [id])
+  engineerId  String?
 }
