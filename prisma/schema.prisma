@@ -35,7 +35,7 @@ enum Role {
 model Address {
   id      String   @id @default(uuid())
   address String
-  Clinic  Clinic[]
+  clinics Clinic[]
 }
 
 model Clinic {
@@ -61,8 +61,8 @@ model Category {
   id      String   @id @default(uuid())
   name    String
   clinics Clinic[]
-  Vendor  Vendor[]
-  Model   Model[]
+  vendors Vendor[]
+  models  Model[]
 }
 
 model Vendor {
@@ -70,7 +70,7 @@ model Vendor {
   name       String
   categoryId String?
   Category   Category? @relation(fields: [categoryId], references: [id])
-  Model      Model[]
+  models     Model[]
 }
 
 model Model {

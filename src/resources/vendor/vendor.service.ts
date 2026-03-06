@@ -15,12 +15,12 @@ export class VendorService {
   }
 
   findAll(categoryId: string) {
-    return this.prismaService.vendor.findMany({ where: { categoryId } });
+    return this.prismaService.vendor.findMany({ where: { categoryId }, include: { models: true } });
   }
 
   async findOne(id: string) {
     await this.checkForExist(id);
-    return this.prismaService.vendor.findUnique({ where: { id } });
+    return this.prismaService.vendor.findUnique({ where: { id }, include: { models: true } });
   }
 
   async update(vendorId: string, updateVendorDto: UpdateVendorDto) {
