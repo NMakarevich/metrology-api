@@ -1,4 +1,24 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateInstrumentDto } from './create-instrument.dto';
+import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
+import { Status } from '../../../../generated/prisma/enums';
 
-export class UpdateInstrumentDto extends PartialType(CreateInstrumentDto) {}
+export class UpdateInstrumentDto {
+  @IsString()
+  @IsOptional()
+  serialNumber: string;
+
+  @IsEnum(Status)
+  @IsOptional()
+  status: Status;
+
+  @IsDateString()
+  @IsOptional()
+  verifiedAt: string;
+
+  @IsDateString()
+  @IsOptional()
+  validUntil: string;
+
+  @IsString()
+  @IsOptional()
+  comment: string;
+}

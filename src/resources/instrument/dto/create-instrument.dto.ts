@@ -1,5 +1,5 @@
-import { Status } from '../entities/instrument.entity';
 import {
+  IsDateString,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -9,6 +9,7 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { Status } from '../../../../generated/prisma/enums';
 
 const TAX_VALUE = 0.2;
 
@@ -17,32 +18,36 @@ export class CreateInstrumentDto {
   @IsNotEmpty()
   serialNumber: string;
 
-  @IsNumber()
-  @IsString()
-  verifiedAt: number;
+  @IsDateString()
+  verifiedAt: string;
 
-  @IsNumber()
-  @IsNotEmpty()
-  validUntil: number;
-
-  @IsUUID()
-  @IsNotEmpty()
-  createdBy: string;
+  @IsDateString()
+  validUntil: string;
 
   @IsEnum(Status)
   status: Status;
+
+  @IsUUID()
+  clinicId: string;
+
+  @IsUUID()
+  categoryId: string;
 
   @IsString()
   @IsOptional()
   comment: string;
 
   @IsUUID()
+  @ValidateIf((createInstrumentDto) => !createInstrumentDto.modelId)
+  vendorId: string;
+
+  @IsString()
+  @IsOptional()
+  vendorName: string;
+
+  @IsUUID()
   @IsOptional()
   modelId: string;
-
-  @ValidateIf((createInstrumentDto) => !createInstrumentDto.vendorId)
-  @IsString()
-  vendorName: string;
 
   @ValidateIf((createInstrumentDto) => !createInstrumentDto.modelId)
   @IsString()

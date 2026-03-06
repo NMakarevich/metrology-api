@@ -39,12 +39,13 @@ model Address {
 }
 
 model Clinic {
-  id         String     @id @default(uuid())
-  name       String
-  address    Address    @relation(fields: [addressId], references: [id])
-  addressId  String
-  contacts   Contact[]
-  categories Category[]
+  id          String       @id @default(uuid())
+  name        String
+  address     Address      @relation(fields: [addressId], references: [id])
+  addressId   String
+  contacts    Contact[]
+  categories  Category[]
+  instruments Instrument[]
 }
 
 model Contact {
@@ -58,11 +59,12 @@ model Contact {
 }
 
 model Category {
-  id      String   @id @default(uuid())
-  name    String
-  clinics Clinic[]
-  vendors Vendor[]
-  models  Model[]
+  id          String       @id @default(uuid())
+  name        String
+  clinics     Clinic[]
+  vendors     Vendor[]
+  models      Model[]
+  instruments Instrument[]
 }
 
 model Vendor {
@@ -74,13 +76,38 @@ model Vendor {
 }
 
 model Model {
-  id              String    @id @default(uuid())
+  id              String       @id @default(uuid())
   name            String
   registryNumber  String
   registryName    String
   validationPrice Float
-  Vendor          Vendor?   @relation(fields: [vendorId], references: [id])
+  Vendor          Vendor?      @relation(fields: [vendorId], references: [id])
   vendorId        String?
-  Category        Category? @relation(fields: [categoryId], references: [id])
+  Category        Category?    @relation(fields: [categoryId], references: [id])
   categoryId      String?
+  instruments     Instrument[]
+}
+
+model Instrument {
+  id           String    @id @default(uuid())
+  serialNumber String
+  verifiedAt   DateTime
+  validUntil   DateTime
+  status       Status
+  comment      String    @default("")
+  clinicId     String?
+  Clinic       Clinic?   @relation(fields: [clinicId], references: [id])
+  categoryId   String?
+  Category     Category? @relation(fields: [categoryId], references: [id])
+  modelId      String?
+  Model        Model?    @relation(fields: [modelId], references: [id])
+}
+
+enum Status {
+  VALID
+  PREPARE_TO_VALIDATION
+  IN_VALIDATION
+  LOST
+  INVALID
+  CANCELED
 }

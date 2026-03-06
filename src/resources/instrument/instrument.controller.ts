@@ -3,11 +3,13 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { InstrumentService } from './instrument.service';
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
@@ -16,7 +18,7 @@ import { Roles } from '../../decorators/roles.decorator';
 import { Role } from '../../../generated/prisma/enums';
 import { JwtService } from '@nestjs/jwt';
 
-@Controller('clinic/:clinicId/category/:categoryId/instrument')
+@Controller('instrument')
 export class InstrumentController {
   constructor(
     private readonly instrumentService: InstrumentService,
@@ -24,20 +26,14 @@ export class InstrumentController {
   ) {}
 
   @Post()
-  create(
-    @Param('clinicId', new ParseUUIDPipe()) clinicId: string,
-    @Param('categoryId', new ParseUUIDPipe()) categoryId: string,
-    @Headers('Authorization') authorization: string,
-    @Body() createInstrumentDto: CreateInstrumentDto,
-  ) {
-    const engineerId = this.extractEngineerIdFromToken(authorization);
-    return this.instrumentService.create(clinicId, categoryId, createInstrumentDto, engineerId);
+  create(@Body() createInstrumentDto: CreateInstrumentDto) {
+    return this.instrumentService.create(createInstrumentDto);
   }
 
   @Get()
   findAll(
-    @Param('clinicId', new ParseUUIDPipe()) clinicId: string,
-    @Param('categoryId', new ParseUUIDPipe()) categoryId: string,
+    @Query('clinic', new ParseUUIDPipe()) clinicId: string,
+    @Query('category', new ParseUUIDPipe()) categoryId: string,
   ) {
     return this.instrumentService.findAll(clinicId, categoryId);
   }
@@ -50,22 +46,15 @@ export class InstrumentController {
   @Patch(':id')
   update(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Headers('Authorization') authorization: string,
     @Body() updateInstrumentDto: UpdateInstrumentDto,
   ) {
-    const engineerId = this.extractEngineerIdFromToken(authorization);
-    return this.instrumentService.update(id, updateInstrumentDto, engineerId);
+    return this.instrumentService.update(id, updateInstrumentDto);
   }
 
   @Roles(Role.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.instrumentService.remove(id);
-  }
-
-  private extractEngineerIdFromToken(authorization: string) {
-    const token = authorization.split('Bearer ')[1];
-    const { sub } = this.jwt.verify(token);
-    return sub;
   }
 }

@@ -1,12 +1,8 @@
 export class Instrument {
   id: string;
   serialNumber: string;
-  verifiedAt: number;
-  validUntil: number;
-  createdAt: number;
-  updatedAt: number;
-  createdBy: string;
-  updatedBy: string;
+  verifiedAt: string | Date;
+  validUntil: string | Date;
   status: Status;
   comment: string;
   clinicId: string;

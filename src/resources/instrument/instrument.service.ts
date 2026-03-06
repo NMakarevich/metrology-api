@@ -1,94 +1,133 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
 import { UpdateInstrumentDto } from './dto/update-instrument.dto';
-import { Instrument } from './entities/instrument.entity';
-import { Instruments } from '../../mock/instruments';
-import { VendorService } from '../vendor/vendor.service';
-import { ModelService } from '../model/model.service';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class InstrumentService {
-  constructor(
-    private readonly instrumentsDb: Instruments,
-    private readonly vendorService: VendorService,
-    private readonly modelService: ModelService,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
-  create(
-    clinicId: string,
-    categoryId: string,
-    createInstrumentDto: CreateInstrumentDto,
-    engineerId: string,
-  ) {
-    const date = new Date().getTime();
-    const newInstrument = Object.assign(new Instrument(), {
-      createdAt: date,
-      updatedAt: date,
-      createdBy: engineerId,
-      updatedBy: engineerId,
-      clinicId,
+  async create(createInstrumentDto: CreateInstrumentDto) {
+    const {
       categoryId,
-    });
-    const { serialNumber, status, modelId, comment, validUntil, verifiedAt } = createInstrumentDto;
-    if (!modelId) {
-      const { modelName, vendorName, registryNumber, registryName, validationPrice } =
-        createInstrumentDto;
-      const newVendor = this.vendorService.create({
-        name: vendorName,
-        categoryId,
-      });
-      const newModel = this.modelService.create({
-        name: modelName,
-        registryName,
-        registryNumber,
-        validationPrice,
-        vendorId: newVendor.id,
-      });
+      clinicId,
+      modelId,
+      validationPrice,
+      registryNumber,
+      registryName,
+      modelName,
+      vendorId,
+      vendorName,
+      ...data
+    } = createInstrumentDto;
 
-      return this.instrumentsDb.create(
-        Object.assign(newInstrument, {
-          modelId: newModel.id,
-          serialNumber,
-          status,
-          comment,
-          validUntil,
-          verifiedAt,
-        }),
-      );
+    if (!modelId && !vendorId) {
+      return this.prismaService.instrument.create({
+        data: {
+          ...data,
+          Clinic: { connect: { id: clinicId } },
+          Category: { connect: { id: categoryId } },
+          Model: {
+            create: {
+              name: modelName,
+              validationPrice,
+              registryNumber,
+              registryName,
+              Vendor: {
+                create: {
+                  name: vendorName,
+                },
+              },
+            },
+          },
+        },
+      });
     }
-    return this.instrumentsDb.create(Object.assign(newInstrument, createInstrumentDto));
+
+    if (!modelId) {
+      return this.prismaService.instrument.create({
+        data: {
+          ...data,
+          Clinic: { connect: { id: clinicId } },
+          Category: { connect: { id: categoryId } },
+          Model: {
+            create: {
+              name: modelName,
+              validationPrice,
+              registryNumber,
+              registryName,
+              Vendor: {
+                connect: { id: vendorId },
+              },
+            },
+          },
+        },
+      });
+    }
+
+    return this.prismaService.instrument.create({
+      data: {
+        ...data,
+        Clinic: { connect: { id: clinicId } },
+        Category: { connect: { id: categoryId } },
+        Model: { connect: { id: modelId } },
+      },
+    });
   }
 
   findAll(clinicId: string, categoryId: string) {
-    return this.instrumentsDb
-      .findAll()
-      .filter(
-        (instrument) => instrument.categoryId === categoryId && instrument.clinicId === clinicId,
-      );
+    return this.prismaService.instrument.findMany({
+      where: { clinicId, categoryId },
+      include: {
+        Model: {
+          include: {
+            Vendor: {
+              omit: { categoryId: true },
+            },
+          },
+          omit: { vendorId: true, categoryId: true },
+        },
+      },
+      omit: { clinicId: true, categoryId: true, modelId: true },
+    });
   }
 
   findOne(id: string) {
-    return this.instrumentsDb.findOne(id);
+    return this.prismaService.instrument.findUnique({
+      where: { id },
+      include: {
+        Model: {
+          include: { Vendor: true },
+        },
+      },
+      omit: { clinicId: true, categoryId: true, modelId: true },
+    });
   }
 
-  update(instrumentId: string, updateInstrumentDto: UpdateInstrumentDto, engineerId: string) {
-    this.checkForExist(instrumentId);
-    return this.instrumentsDb.update(
-      instrumentId,
-      Object.assign(updateInstrumentDto, {
-        updatedAt: new Date().getTime(),
-        updatedBy: engineerId,
-      }),
-    );
+  async update(instrumentId: string, updateInstrumentDto: UpdateInstrumentDto) {
+    await this.checkForExist(instrumentId);
+    return this.prismaService.instrument.update({
+      where: { id: instrumentId },
+      data: updateInstrumentDto,
+      include: {
+        Model: {
+          include: { Vendor: true },
+        },
+      },
+    });
   }
 
-  remove(id: string) {
-    this.checkForExist(id);
-    return this.instrumentsDb.delete(id);
+  async remove(id: string) {
+    await this.checkForExist(id);
+    return this.prismaService.instrument.delete({ where: { id } });
   }
 
-  private checkForExist(id: string) {
-    const instrument = this.instrumentsDb.findOne(id);
+  private async checkForExist(id: string) {
+    const instrument = await this.prismaService.instrument.findUnique({
+      where: {
+        id,
+      },
+    });
     if (!instrument) {
       throw new NotFoundException('Instrument not found');
     }
