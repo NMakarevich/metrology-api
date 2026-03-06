@@ -62,6 +62,7 @@ model Category {
   name    String
   clinics Clinic[]
   Vendor  Vendor[]
+  Model   Model[]
 }
 
 model Vendor {
@@ -69,4 +70,17 @@ model Vendor {
   name       String
   categoryId String?
   Category   Category? @relation(fields: [categoryId], references: [id])
+  Model      Model[]
+}
+
+model Model {
+  id              String    @id @default(uuid())
+  name            String
+  registryNumber  String
+  registryName    String
+  validationPrice Float
+  Vendor          Vendor?   @relation(fields: [vendorId], references: [id])
+  vendorId        String?
+  Category        Category? @relation(fields: [categoryId], references: [id])
+  categoryId      String?
 }

@@ -1,24 +1,31 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+  Query,
+} from '@nestjs/common';
 import { VendorService } from './vendor.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
 import { Roles } from '../../decorators/roles.decorator';
 import { Role } from '../../../generated/prisma/enums';
 
-@Controller('category/:categoryId/vendor')
+@Controller('vendor')
 export class VendorController {
   constructor(private readonly vendorService: VendorService) {}
 
   @Post()
-  create(
-    @Param('categoryId', new ParseUUIDPipe()) categoryId: string,
-    @Body() createVendorDto: CreateVendorDto,
-  ) {
+  create(@Body() createVendorDto: CreateVendorDto) {
     return this.vendorService.create(createVendorDto);
   }
 
   @Get()
-  findAll(@Param('categoryId', new ParseUUIDPipe()) categoryId: string) {
+  findAll(@Query('category', new ParseUUIDPipe()) categoryId: string) {
     return this.vendorService.findAll(categoryId);
   }
 

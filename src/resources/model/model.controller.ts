@@ -1,27 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+  Query,
+} from '@nestjs/common';
 import { ModelService } from './model.service';
 import { CreateModelDto } from './dto/create-model.dto';
 import { UpdateModelDto } from './dto/update-model.dto';
 import { Roles } from '../../decorators/roles.decorator';
 import { Role } from '../../../generated/prisma/enums';
 
-@Controller('category/:categoryId/vendor/:vendorId/model')
+@Controller('model')
 export class ModelController {
   constructor(private readonly modelService: ModelService) {}
 
   @Post()
-  create(
-    @Param('categoryId', new ParseUUIDPipe()) categoryId: string,
-    @Param('vendorId', new ParseUUIDPipe()) vendorId: string,
-    @Body() createModelDto: CreateModelDto,
-  ) {
+  create(@Body() createModelDto: CreateModelDto) {
     return this.modelService.create(createModelDto);
   }
 
   @Get()
   findAll(
-    @Param('categoryId', new ParseUUIDPipe()) categoryId: string,
-    @Param('vendorId', new ParseUUIDPipe()) vendorId: string,
+    @Query('category', new ParseUUIDPipe()) categoryId: string,
+    @Query('vendor', new ParseUUIDPipe()) vendorId: string,
   ) {
     return this.modelService.findAll(categoryId, vendorId);
   }
