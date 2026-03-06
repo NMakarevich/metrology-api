@@ -12,8 +12,8 @@ export class ModelService {
     return this.prismaService.model.create({
       data: {
         ...data,
-        Category: { connect: { id: categoryId } },
-        Vendor: { connect: { id: vendorId } },
+        category: { connect: { id: categoryId } },
+        vendor: { connect: { id: vendorId } },
       },
     });
   }
@@ -34,13 +34,13 @@ export class ModelService {
     if (categoryId && categoryId !== model.categoryId) {
       await this.prismaService.model.update({
         where: { id },
-        data: { Category: { connect: { id: categoryId }, disconnect: { id: model.categoryId } } },
+        data: { category: { connect: { id: categoryId }, disconnect: { id: model.categoryId } } },
       });
     }
     if (vendorId && vendorId !== model.vendorId) {
       await this.prismaService.model.update({
         where: { id },
-        data: { Vendor: { connect: { id: vendorId }, disconnect: { id: model.vendorId } } },
+        data: { vendor: { connect: { id: vendorId }, disconnect: { id: model.vendorId } } },
       });
     }
     return this.prismaService.model.update({ where: { id }, data });

@@ -55,7 +55,7 @@ model Contact {
   phone    String?
   email    String?
   clinicId String?
-  Clinic   Clinic? @relation(fields: [clinicId], references: [id])
+  clinic   Clinic? @relation(fields: [clinicId], references: [id])
 }
 
 model Category {
@@ -71,7 +71,7 @@ model Vendor {
   id         String    @id @default(uuid())
   name       String
   categoryId String?
-  Category   Category? @relation(fields: [categoryId], references: [id])
+  category   Category? @relation(fields: [categoryId], references: [id])
   models     Model[]
 }
 
@@ -81,9 +81,9 @@ model Model {
   registryNumber  String
   registryName    String
   validationPrice Float
-  Vendor          Vendor?      @relation(fields: [vendorId], references: [id])
+  vendor          Vendor?      @relation(fields: [vendorId], references: [id])
   vendorId        String?
-  Category        Category?    @relation(fields: [categoryId], references: [id])
+  category        Category?    @relation(fields: [categoryId], references: [id])
   categoryId      String?
   instruments     Instrument[]
 }
@@ -96,11 +96,11 @@ model Instrument {
   status       Status
   comment      String    @default("")
   clinicId     String?
-  Clinic       Clinic?   @relation(fields: [clinicId], references: [id])
+  clinic       Clinic?   @relation(fields: [clinicId], references: [id])
   categoryId   String?
-  Category     Category? @relation(fields: [categoryId], references: [id])
+  category     Category? @relation(fields: [categoryId], references: [id])
   modelId      String?
-  Model        Model?    @relation(fields: [modelId], references: [id])
+  model        Model?    @relation(fields: [modelId], references: [id])
 }
 
 enum Status {

@@ -10,7 +10,7 @@ export class VendorService {
   create(createVendorDto: CreateVendorDto) {
     const { categoryId, ...data } = createVendorDto;
     return this.prismaService.vendor.create({
-      data: { ...data, Category: { connect: { id: categoryId } } },
+      data: { ...data, category: { connect: { id: categoryId } } },
     });
   }
 
@@ -30,7 +30,7 @@ export class VendorService {
     if (categoryId && categoryId !== vendor.categoryId) {
       await this.prismaService.vendor.update({
         where: { id: vendorId },
-        data: { Category: { connect: { id: categoryId }, disconnect: { id: vendor.categoryId } } },
+        data: { category: { connect: { id: categoryId }, disconnect: { id: vendor.categoryId } } },
       });
     }
     return this.prismaService.vendor.update({ where: { id: vendorId }, data });

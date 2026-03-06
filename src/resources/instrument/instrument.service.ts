@@ -25,15 +25,15 @@ export class InstrumentService {
       return this.prismaService.instrument.create({
         data: {
           ...data,
-          Clinic: { connect: { id: clinicId } },
-          Category: { connect: { id: categoryId } },
-          Model: {
+          clinic: { connect: { id: clinicId } },
+          category: { connect: { id: categoryId } },
+          model: {
             create: {
               name: modelName,
               validationPrice,
               registryNumber,
               registryName,
-              Vendor: {
+              vendor: {
                 create: {
                   name: vendorName,
                 },
@@ -48,15 +48,15 @@ export class InstrumentService {
       return this.prismaService.instrument.create({
         data: {
           ...data,
-          Clinic: { connect: { id: clinicId } },
-          Category: { connect: { id: categoryId } },
-          Model: {
+          clinic: { connect: { id: clinicId } },
+          category: { connect: { id: categoryId } },
+          model: {
             create: {
               name: modelName,
               validationPrice,
               registryNumber,
               registryName,
-              Vendor: {
+              vendor: {
                 connect: { id: vendorId },
               },
             },
@@ -68,9 +68,9 @@ export class InstrumentService {
     return this.prismaService.instrument.create({
       data: {
         ...data,
-        Clinic: { connect: { id: clinicId } },
-        Category: { connect: { id: categoryId } },
-        Model: { connect: { id: modelId } },
+        clinic: { connect: { id: clinicId } },
+        category: { connect: { id: categoryId } },
+        model: { connect: { id: modelId } },
       },
     });
   }
@@ -79,9 +79,9 @@ export class InstrumentService {
     return this.prismaService.instrument.findMany({
       where: { clinicId, categoryId },
       include: {
-        Model: {
+        model: {
           include: {
-            Vendor: {
+            vendor: {
               omit: { categoryId: true },
             },
           },
@@ -96,8 +96,13 @@ export class InstrumentService {
     return this.prismaService.instrument.findUnique({
       where: { id },
       include: {
-        Model: {
-          include: { Vendor: true },
+        model: {
+          include: {
+            vendor: {
+              omit: { categoryId: true },
+            },
+          },
+          omit: { vendorId: true, categoryId: true },
         },
       },
       omit: { clinicId: true, categoryId: true, modelId: true },
@@ -110,10 +115,16 @@ export class InstrumentService {
       where: { id: instrumentId },
       data: updateInstrumentDto,
       include: {
-        Model: {
-          include: { Vendor: true },
+        model: {
+          include: {
+            vendor: {
+              omit: { categoryId: true },
+            },
+          },
+          omit: { vendorId: true, categoryId: true },
         },
       },
+      omit: { clinicId: true, categoryId: true, modelId: true },
     });
   }
 
@@ -123,11 +134,7 @@ export class InstrumentService {
   }
 
   private async checkForExist(id: string) {
-    const instrument = await this.prismaService.instrument.findUnique({
-      where: {
-        id,
-      },
-    });
+    const instrument = await this.prismaService.instrument.findUnique({ where: { id } });
     if (!instrument) {
       throw new NotFoundException('Instrument not found');
     }

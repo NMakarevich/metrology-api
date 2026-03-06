@@ -10,7 +10,7 @@ export class ContactService {
   create(createContactDto: CreateContactDto) {
     const { clinicId, ...data } = createContactDto;
     return this.prismaService.contact.create({
-      data: { ...data, Clinic: { connect: { id: clinicId } } },
+      data: { ...data, clinic: { connect: { id: clinicId } } },
     });
   }
 
