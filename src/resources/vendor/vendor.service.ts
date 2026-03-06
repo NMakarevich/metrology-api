@@ -8,7 +8,10 @@ export class VendorService {
   constructor(private readonly prismaService: PrismaService) {}
 
   create(createVendorDto: CreateVendorDto) {
-    return this.prismaService.vendor.create({ data: createVendorDto });
+    const { categoryId, ...data } = createVendorDto;
+    return this.prismaService.vendor.create({
+      data: { ...data, Category: { connect: { id: categoryId } } },
+    });
   }
 
   findAll(categoryId: string) {
@@ -22,7 +25,15 @@ export class VendorService {
 
   async update(vendorId: string, updateVendorDto: UpdateVendorDto) {
     await this.checkForExist(vendorId);
-    return this.prismaService.vendor.update({ where: { id: vendorId }, data: updateVendorDto });
+    const { categoryId, ...data } = updateVendorDto;
+    const vendor = await this.findOne(vendorId);
+    if (categoryId && categoryId !== vendor.categoryId) {
+      await this.prismaService.vendor.update({
+        where: { id: vendorId },
+        data: { Category: { connect: { id: categoryId }, disconnect: { id: vendor.categoryId } } },
+      });
+    }
+    return this.prismaService.vendor.update({ where: { id: vendorId }, data });
   }
 
   async remove(id: string) {
