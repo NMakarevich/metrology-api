@@ -8,7 +8,10 @@ export class ContactService {
   constructor(private readonly prismaService: PrismaService) {}
 
   create(createContactDto: CreateContactDto) {
-    return this.prismaService.contact.create({ data: createContactDto });
+    const { clinicId, ...data } = createContactDto;
+    return this.prismaService.contact.create({
+      data: { ...data, Clinic: { connect: { id: clinicId } } },
+    });
   }
 
   findAll() {
