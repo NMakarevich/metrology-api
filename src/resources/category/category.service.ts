@@ -25,7 +25,8 @@ export class CategoryService {
     return this.prismaService.category.findMany({ include: { clinics: true } });
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
+    await this.checkForExist(id);
     return this.prismaService.category.findUnique({ where: { id }, include: { clinics: true } });
   }
 
@@ -51,7 +52,7 @@ export class CategoryService {
   }
 
   async checkForExist(id: string) {
-    const category = await this.findOne(id);
+    const category = await this.prismaService.category.findUnique({ where: { id } });
     if (!category) {
       throw new NotFoundException(`Category not found`);
     }
