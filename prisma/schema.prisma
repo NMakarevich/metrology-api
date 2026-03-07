@@ -60,12 +60,13 @@ model Contact {
 }
 
 model Category {
-  id          String       @id @default(uuid())
-  name        String
-  clinics     Clinic[]
-  vendors     Vendor[]
-  models      Model[]
-  instruments Instrument[]
+  id           String         @id @default(uuid())
+  name         String
+  clinics      Clinic[]
+  vendors      Vendor[]
+  models       Model[]
+  instruments  Instrument[]
+  Verification Verification[]
 }
 
 model Vendor {
@@ -90,18 +91,20 @@ model Model {
 }
 
 model Instrument {
-  id           String    @id @default(uuid())
-  serialNumber String
-  verifiedAt   DateTime
-  validUntil   DateTime
-  status       Status
-  comment      String    @default("")
-  clinicId     String?
-  clinic       Clinic?   @relation(fields: [clinicId], references: [id])
-  categoryId   String?
-  category     Category? @relation(fields: [categoryId], references: [id])
-  modelId      String?
-  model        Model?    @relation(fields: [modelId], references: [id])
+  id             String        @id @default(uuid())
+  serialNumber   String
+  verifiedAt     DateTime
+  validUntil     DateTime
+  status         Status
+  comment        String        @default("")
+  clinicId       String?
+  clinic         Clinic?       @relation(fields: [clinicId], references: [id])
+  categoryId     String?
+  category       Category?     @relation(fields: [categoryId], references: [id])
+  modelId        String?
+  model          Model?        @relation(fields: [modelId], references: [id])
+  verificationId String?
+  verification   Verification? @relation(fields: [verificationId], references: [id])
 }
 
 enum Status {
@@ -121,4 +124,22 @@ model Note {
   updatedAt   DateTime  @default(now())
   engineer    Engineer? @relation(fields: [engineerId], references: [id])
   engineerId  String?
+}
+
+model Verification {
+  id          String              @id @default(uuid())
+  account     Float?
+  accountId   String?
+  date        DateTime            @default(now())
+  category    Category?           @relation(fields: [categoryId], references: [id])
+  categoryId  String?
+  instruments Instrument[]
+  status      VerificationStatus? @default(READY_TO_VALIDATION)
+}
+
+enum VerificationStatus {
+  READY_TO_VALIDATION
+  IN_VALIDATION
+  PAID
+  DONE
 }

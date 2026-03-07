@@ -1,8 +1,16 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateVerificationDto } from './create-verification.dto';
-import { IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { VerificationStatus } from '../../../../generated/prisma/enums';
 
-export class UpdateVerificationDto extends PartialType(CreateVerificationDto) {
+export class UpdateVerificationDto {
   @IsString()
-  account: string;
+  @IsOptional()
+  account: number;
+
+  @IsString()
+  @IsOptional()
+  accountId: string;
+
+  @IsEnum(VerificationStatus)
+  @IsOptional()
+  status: VerificationStatus;
 }
