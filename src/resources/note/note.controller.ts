@@ -23,6 +23,7 @@ export class NoteController {
     private readonly jwt: JwtService,
   ) {}
 
+  @HttpCode(HttpStatus.CREATED)
   @Post()
   create(@Body() createNoteDto: CreateNoteDto, @Headers('Authorization') authorization: string) {
     const engineerId = this.extractEngineerIdFromToken(authorization);

@@ -21,6 +21,7 @@ import { Role } from '../../../generated/prisma/enums';
 export class VendorController {
   constructor(private readonly vendorService: VendorService) {}
 
+  @HttpCode(HttpStatus.CREATED)
   @Post()
   create(@Body() createVendorDto: CreateVendorDto) {
     return this.vendorService.create(createVendorDto);

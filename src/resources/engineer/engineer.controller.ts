@@ -26,6 +26,7 @@ export class EngineerController {
   constructor(private readonly engineerService: EngineerService) {}
 
   @Roles(Role.ADMIN)
+  @HttpCode(HttpStatus.CREATED)
   @Post()
   async create(@Body() createEngineerDto: CreateEngineerDto) {
     return this.engineerService.create(createEngineerDto);
@@ -51,8 +52,8 @@ export class EngineerController {
     return this.engineerService.update(id, updateEngineerDto, authorization);
   }
 
-  @HttpCode(HttpStatus.NO_CONTENT)
   @Roles(Role.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.engineerService.remove(id);

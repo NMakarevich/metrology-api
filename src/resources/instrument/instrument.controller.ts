@@ -25,6 +25,7 @@ export class InstrumentController {
     private readonly jwt: JwtService,
   ) {}
 
+  @HttpCode(HttpStatus.CREATED)
   @Post()
   create(@Body() createInstrumentDto: CreateInstrumentDto) {
     return this.instrumentService.create(createInstrumentDto);

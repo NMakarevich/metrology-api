@@ -20,6 +20,7 @@ import { Role } from '../../../generated/prisma/enums';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
+  @HttpCode(HttpStatus.CREATED)
   @Post()
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);

@@ -8,6 +8,8 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { ModelService } from './model.service';
 import { CreateModelDto } from './dto/create-model.dto';
@@ -19,6 +21,7 @@ import { Role } from '../../../generated/prisma/enums';
 export class ModelController {
   constructor(private readonly modelService: ModelService) {}
 
+  @HttpCode(HttpStatus.CREATED)
   @Post()
   create(@Body() createModelDto: CreateModelDto) {
     return this.modelService.create(createModelDto);
@@ -43,6 +46,7 @@ export class ModelController {
   }
 
   @Roles(Role.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.modelService.remove(id);

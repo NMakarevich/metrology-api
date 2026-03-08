@@ -24,19 +24,16 @@ export class ContactController {
     return this.contactService.create(createContactDto);
   }
 
-  @HttpCode(HttpStatus.OK)
   @Get()
   findAll() {
     return this.contactService.findAll();
   }
 
-  @HttpCode(HttpStatus.OK)
   @Get(':id')
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.contactService.findOne(id);
   }
 
-  @HttpCode(HttpStatus.OK)
   @Patch(':id')
   update(@Param('id', new ParseUUIDPipe()) id: string, @Body() updateContactDto: UpdateContactDto) {
     return this.contactService.update(id, updateContactDto);

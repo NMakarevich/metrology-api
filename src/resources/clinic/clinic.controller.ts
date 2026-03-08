@@ -26,19 +26,16 @@ export class ClinicController {
     return this.clinicService.create(createClinicDto);
   }
 
-  @HttpCode(HttpStatus.OK)
   @Get()
   findAll() {
     return this.clinicService.findAll();
   }
 
-  @HttpCode(HttpStatus.OK)
   @Get(':id')
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.clinicService.findOne(id);
   }
 
-  @HttpCode(HttpStatus.CREATED)
   @Patch(':id')
   update(@Param('id', new ParseUUIDPipe()) id: string, @Body() updateClinicDto: UpdateClinicDto) {
     return this.clinicService.update(id, updateClinicDto);

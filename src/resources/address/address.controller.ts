@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { AddressService } from './address.service';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
@@ -9,6 +19,7 @@ import { Role } from '../../../generated/prisma/enums';
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
+  @HttpCode(HttpStatus.CREATED)
   @Post()
   create(@Body() createAddressDto: CreateAddressDto) {
     return this.addressService.create(createAddressDto);
@@ -30,6 +41,7 @@ export class AddressController {
   }
 
   @Roles(Role.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.addressService.remove(id);
