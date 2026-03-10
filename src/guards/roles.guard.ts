@@ -1,9 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Role } from '../../generated/prisma/enums';
 import { EngineerService } from '../resources/engineer/engineer.service';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import 'dotenv/config';
 import * as process from 'node:process';
 import { DEFAULT_JWT_SECRET } from '../resources/auth/constants';
@@ -39,9 +39,15 @@ export class RolesGuard implements CanActivate {
 
   private async extractId(authorization: string) {
     const token = authorization.replace('Bearer ', '');
-    const { sub } = await this.jwt.verify(token, {
-      secret: process.env.JWT_SECRET ?? DEFAULT_JWT_SECRET,
-    });
-    return sub;
+    try {
+      const { sub } = await this.jwt.verify(token, {
+        secret: process.env.JWT_SECRET ?? DEFAULT_JWT_SECRET,
+      });
+      return sub;
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        throw new UnauthorizedException();
+      }
+    }
   }
 }
