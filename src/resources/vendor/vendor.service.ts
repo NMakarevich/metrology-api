@@ -15,12 +15,18 @@ export class VendorService {
   }
 
   findAll(categoryId: string) {
-    return this.prismaService.vendor.findMany({ where: { categoryId }, include: { models: true } });
+    return this.prismaService.vendor.findMany({
+      where: { categoryId },
+      include: { models: { omit: { vendorId: true, categoryId: true } } },
+    });
   }
 
   async findOne(id: string) {
     await this.checkForExist(id);
-    return this.prismaService.vendor.findUnique({ where: { id }, include: { models: true } });
+    return this.prismaService.vendor.findUnique({
+      where: { id },
+      include: { models: { omit: { vendorId: true, categoryId: true } } },
+    });
   }
 
   async update(vendorId: string, updateVendorDto: UpdateVendorDto) {

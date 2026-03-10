@@ -19,12 +19,30 @@ export class ModelService {
   }
 
   findAll(categoryId: string, vendorId: string) {
-    return this.prismaService.model.findMany({ where: { categoryId, vendorId } });
+    return this.prismaService.model.findMany({
+      where: { categoryId, vendorId },
+      include: {
+        vendor: {
+          omit: {
+            categoryId: true,
+          },
+        },
+      },
+    });
   }
 
   async findOne(id: string) {
     await this.checkForExist(id);
-    return this.prismaService.model.findUnique({ where: { id } });
+    return this.prismaService.model.findUnique({
+      where: { id },
+      include: {
+        vendor: {
+          omit: {
+            categoryId: true,
+          },
+        },
+      },
+    });
   }
 
   async update(id: string, updateModelDto: UpdateModelDto) {

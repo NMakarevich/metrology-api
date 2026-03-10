@@ -15,11 +15,30 @@ export class ContactService {
   }
 
   findAll() {
-    return this.prismaService.contact.findMany();
+    return this.prismaService.contact.findMany({
+      include: {
+        clinic: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
   }
 
   findOne(id: string) {
-    return this.prismaService.contact.findUnique({ where: { id } });
+    return this.prismaService.contact.findUnique({
+      where: { id },
+      include: {
+        clinic: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
   }
 
   update(id: string, updateContactDto: UpdateContactDto) {

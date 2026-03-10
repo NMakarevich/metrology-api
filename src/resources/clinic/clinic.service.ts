@@ -55,6 +55,12 @@ export class ClinicService {
             clinicId: true,
           },
         },
+        categories: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         address: true,
       },
       omit: {
@@ -70,6 +76,17 @@ export class ClinicService {
         contacts: {
           omit: {
             clinicId: true,
+          },
+        },
+        categories: {
+          select: {
+            id: true,
+            name: true,
+            _count: {
+              select: {
+                instruments: true,
+              },
+            },
           },
         },
         address: true,

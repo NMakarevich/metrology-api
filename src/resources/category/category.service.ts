@@ -22,12 +22,64 @@ export class CategoryService {
   }
 
   findAll() {
-    return this.prismaService.category.findMany({ include: { clinics: true } });
+    return this.prismaService.category.findMany({
+      include: {
+        clinics: {
+          omit: {
+            addressId: true,
+          },
+          include: {
+            address: {
+              select: {
+                address: true,
+              },
+            },
+            _count: {
+              select: {
+                instruments: true,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
   async findOne(id: string) {
     await this.checkForExist(id);
-    return this.prismaService.category.findUnique({ where: { id }, include: { clinics: true } });
+    return this.prismaService.category.findUnique({
+      where: { id },
+      include: {
+        clinics: {
+          include: {
+            address: {
+              select: {
+                address: true,
+              },
+            },
+            instruments: {
+              include: {
+                model: {
+                  omit: { vendorId: true, categoryId: true },
+                  include: {
+                    vendor: {
+                      omit: {
+                        categoryId: true,
+                      },
+                    },
+                  },
+                },
+              },
+              omit: {
+                clinicId: true,
+                categoryId: true,
+                modelId: true,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
   async update(categoryId: string, updateCategoryDto: UpdateCategoryDto) {
