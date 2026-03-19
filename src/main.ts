@@ -1,4 +1,4 @@
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import 'dotenv/config';
 import * as process from 'node:process';
@@ -10,8 +10,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   const port = Number(process.env.PORT ?? 4100);
 
-  const { httpAdapter } = app.get(HttpAdapterHost);
-  app.useGlobalFilters(new PrismaExceptionFilter(httpAdapter));
+  app.useGlobalFilters(new PrismaExceptionFilter());
   await app.listen(port);
 }
 bootstrap();
