@@ -1,4 +1,11 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Role } from '../../generated/prisma/enums';
@@ -27,14 +34,23 @@ export class RolesGuard implements CanActivate {
     const { authorization } = context.switchToHttp().getRequest().headers;
     const id = await this.extractId(authorization);
     const { method, url } = context.switchToHttp().getRequest();
-    const engineer = await this.engineerService.findOne(id);
-    if (url.includes('engineer') && (method === 'PATCH' || method === 'DELETE')) {
-      const engineerId = url.split('/').pop();
-      const targetEngineer = await this.engineerService.findOne(engineerId);
-      if (engineer.role === Role.ENGINEER) return targetEngineer.role === Role.ENGINEER;
-      else return true;
+
+    try {
+      const engineer = await this.engineerService.findOne(id);
+      if (url.includes('engineer') && (method === 'PATCH' || method === 'DELETE')) {
+        const engineerId = url.split('/').pop();
+        const targetEngineer = await this.engineerService.findOne(engineerId);
+        if (engineer.role === Role.ENGINEER) return targetEngineer.role === Role.ENGINEER;
+        else return true;
+      }
+      return requiredRoles.includes(engineer.role);
+    } catch (error: unknown) {
+      if (error instanceof HttpException) {
+        if (error.getStatus() === HttpStatus.NOT_FOUND) {
+          throw new UnauthorizedException();
+        }
+      }
     }
-    return requiredRoles.includes(engineer.role);
   }
 
   private async extractId(authorization: string) {
