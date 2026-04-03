@@ -27,7 +27,7 @@ export class InstrumentController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  create(@Body() createInstrumentDto: CreateInstrumentDto) {
+  create(@Body() createInstrumentDto: CreateInstrumentDto[]) {
     return this.instrumentService.create(createInstrumentDto);
   }
 

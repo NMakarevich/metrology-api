@@ -7,72 +7,75 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class InstrumentService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(createInstrumentDto: CreateInstrumentDto) {
-    const {
-      categoryId,
-      clinicId,
-      modelId,
-      validationPrice,
-      registryNumber,
-      registryName,
-      modelName,
-      vendorId,
-      vendorName,
-      ...data
-    } = createInstrumentDto;
+  async create(createInstrumentDto: CreateInstrumentDto[]) {
+    const instruments = createInstrumentDto.map((instrument) => {
+      const {
+        categoryId,
+        clinicId,
+        modelId,
+        validationPrice,
+        registryNumber,
+        registryName,
+        modelName,
+        vendorId,
+        vendorName,
+        ...data
+      } = instrument;
 
-    if (!modelId && !vendorId) {
-      return this.prismaService.instrument.create({
-        data: {
-          ...data,
-          clinic: { connect: { id: clinicId } },
-          category: { connect: { id: categoryId } },
-          model: {
-            create: {
-              name: modelName,
-              validationPrice,
-              registryNumber,
-              registryName,
-              vendor: {
-                create: {
-                  name: vendorName,
+      if (!modelId && !vendorId) {
+        return this.prismaService.instrument.create({
+          data: {
+            ...data,
+            clinic: { connect: { id: clinicId } },
+            category: { connect: { id: categoryId } },
+            model: {
+              create: {
+                name: modelName,
+                validationPrice,
+                registryNumber,
+                registryName,
+                vendor: {
+                  create: {
+                    name: vendorName,
+                  },
                 },
               },
             },
           },
-        },
-      });
-    }
+        });
+      }
 
-    if (!modelId) {
+      if (!modelId) {
+        return this.prismaService.instrument.create({
+          data: {
+            ...data,
+            clinic: { connect: { id: clinicId } },
+            category: { connect: { id: categoryId } },
+            model: {
+              create: {
+                name: modelName,
+                validationPrice,
+                registryNumber,
+                registryName,
+                vendor: {
+                  connect: { id: vendorId },
+                },
+              },
+            },
+          },
+        });
+      }
+
       return this.prismaService.instrument.create({
         data: {
           ...data,
           clinic: { connect: { id: clinicId } },
           category: { connect: { id: categoryId } },
-          model: {
-            create: {
-              name: modelName,
-              validationPrice,
-              registryNumber,
-              registryName,
-              vendor: {
-                connect: { id: vendorId },
-              },
-            },
-          },
+          model: { connect: { id: modelId } },
         },
       });
-    }
-
-    return this.prismaService.instrument.create({
-      data: {
-        ...data,
-        clinic: { connect: { id: clinicId } },
-        category: { connect: { id: categoryId } },
-        model: { connect: { id: modelId } },
-      },
     });
+    return this.prismaService.$transaction(instruments);
   }
 
   findAll(clinicId: string, categoryId: string) {
