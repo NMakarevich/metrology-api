@@ -16,6 +16,7 @@ import { NoteModule } from './resources/note/note.module';
 import { VerificationModule } from './resources/verification/verification.module';
 import { ContactModule } from './resources/contact/contact.module';
 import { JwtService } from '@nestjs/jwt';
+import { PlanningModule } from './resources/planning/planning.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { JwtService } from '@nestjs/jwt';
     NoteModule,
     VerificationModule,
     ContactModule,
+    PlanningModule,
   ],
   controllers: [AppController],
   providers: [

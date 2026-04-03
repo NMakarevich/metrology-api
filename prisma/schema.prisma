@@ -60,13 +60,14 @@ model Contact {
 }
 
 model Category {
-  id           String         @id @default(uuid())
-  name         String
-  clinics      Clinic[]
-  vendors      Vendor[]
-  models       Model[]
-  instruments  Instrument[]
-  Verification Verification[]
+  id                 String               @id @default(uuid())
+  name               String
+  clinics            Clinic[]
+  vendors            Vendor[]
+  models             Model[]
+  instruments        Instrument[]
+  Verification       Verification[]
+  planningCategories PlanningCategories[]
 }
 
 model Vendor {
@@ -91,20 +92,22 @@ model Model {
 }
 
 model Instrument {
-  id             String        @id @default(uuid())
-  serialNumber   String
-  verifiedAt     DateTime
-  validUntil     DateTime
-  status         Status
-  comment        String        @default("")
-  clinicId       String?
-  clinic         Clinic?       @relation(fields: [clinicId], references: [id])
-  categoryId     String?
-  category       Category?     @relation(fields: [categoryId], references: [id])
-  modelId        String?
-  model          Model?        @relation(fields: [modelId], references: [id])
-  verificationId String?
-  verification   Verification? @relation(fields: [verificationId], references: [id])
+  id                   String              @id @default(uuid())
+  serialNumber         String
+  verifiedAt           DateTime
+  validUntil           DateTime
+  status               Status
+  comment              String              @default("")
+  clinicId             String?
+  clinic               Clinic?             @relation(fields: [clinicId], references: [id])
+  categoryId           String?
+  category             Category?           @relation(fields: [categoryId], references: [id])
+  modelId              String?
+  model                Model?              @relation(fields: [modelId], references: [id])
+  verificationId       String?
+  verification         Verification?       @relation(fields: [verificationId], references: [id])
+  planningCategories   PlanningCategories? @relation(fields: [planningCategoriesId], references: [id])
+  planningCategoriesId String?
 }
 
 enum Status {
@@ -142,4 +145,19 @@ enum VerificationStatus {
   IN_VALIDATION
   PAID
   DONE
+}
+
+model Planning {
+  year       Int                  @id @unique
+  categories PlanningCategories[]
+}
+
+model PlanningCategories {
+  id           String       @id @default(uuid())
+  month        Int
+  categoryId   String?
+  category     Category?    @relation(fields: [categoryId], references: [id])
+  instruments  Instrument[]
+  planning     Planning?    @relation(fields: [planningYear], references: [year])
+  planningYear Int?
 }
