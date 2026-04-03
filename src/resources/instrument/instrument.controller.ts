@@ -16,14 +16,10 @@ import { CreateInstrumentDto } from './dto/create-instrument.dto';
 import { UpdateInstrumentDto } from './dto/update-instrument.dto';
 import { Roles } from '../../decorators/roles.decorator';
 import { Role } from '../../../generated/prisma/enums';
-import { JwtService } from '@nestjs/jwt';
 
 @Controller('instrument')
 export class InstrumentController {
-  constructor(
-    private readonly instrumentService: InstrumentService,
-    private readonly jwt: JwtService,
-  ) {}
+  constructor(private readonly instrumentService: InstrumentService) {}
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
