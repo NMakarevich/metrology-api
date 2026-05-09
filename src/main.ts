@@ -12,6 +12,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.use(LoggerMiddleware);
   const port = Number(process.env.PORT ?? 4100);
+  app.enableCors();
 
   app.useGlobalFilters(new PrismaExceptionFilter(), new HttpExceptionFilter());
   await app.listen(port);
