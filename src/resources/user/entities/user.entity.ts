@@ -1,7 +1,7 @@
 import { Exclude } from 'class-transformer';
 import { Role } from '../../../../generated/prisma/enums';
 
-export class Engineer {
+export class User {
   id: string;
   firstName: string;
   lastName: string;
@@ -17,7 +17,7 @@ export class Engineer {
   updatedBy: string | null;
   version: number;
 
-  constructor(partial: Partial<Engineer>) {
+  constructor(partial: Partial<User>) {
     Object.assign(this, partial);
   }
 }

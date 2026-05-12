@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { EngineerModule } from '../engineer/engineer.module';
+import { UserModule } from '../user/user.module';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './local.strategy';
 import { JwtModule } from '@nestjs/jwt';
@@ -24,7 +24,7 @@ import { APP_GUARD } from '@nestjs/core';
     },
   ],
   imports: [
-    EngineerModule,
+    UserModule,
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET ?? DEFAULT_JWT_SECRET,
