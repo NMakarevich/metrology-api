@@ -1,7 +1,7 @@
 import { IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
 import { Role } from '../../../../generated/prisma/enums';
 
-export class CreateEngineerDto {
+export class CreateUserDto {
   @IsString()
   @MinLength(2, { message: 'First name must be at least 2 characters' })
   firstName: string;

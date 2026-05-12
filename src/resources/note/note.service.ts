@@ -7,20 +7,20 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class NoteService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  create(createNoteDto: CreateNoteDto, engineerId: string) {
+  create(createNoteDto: CreateNoteDto, userId: string) {
     return this.prismaService.note.create({
-      data: { ...createNoteDto, engineer: { connect: { id: engineerId } } },
+      data: { ...createNoteDto, user: { connect: { id: userId } } },
       include: {
-        engineer: true,
+        user: true,
       },
     });
   }
 
-  findAll(engineerId: string) {
+  findAll(userId: string) {
     return this.prismaService.note.findMany({
-      where: { engineerId },
+      where: { userId },
       include: {
-        engineer: true,
+        user: true,
       },
     });
   }
@@ -29,9 +29,9 @@ export class NoteService {
     return this.prismaService.note.findUnique({ where: { id } });
   }
 
-  async update(id: string, updateNoteDto: UpdateNoteDto, engineerId: string) {
+  async update(id: string, updateNoteDto: UpdateNoteDto, userId: string) {
     const note = await this.findOne(id);
-    if (note.engineerId !== engineerId) {
+    if (note.userId !== userId) {
       throw new UnauthorizedException();
     }
     return this.prismaService.note.update({ where: { id }, data: updateNoteDto });

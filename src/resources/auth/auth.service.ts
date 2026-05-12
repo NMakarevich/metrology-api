@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EngineerService } from '../engineer/engineer.service';
+import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import 'dotenv/config';
@@ -7,25 +7,25 @@ import 'dotenv/config';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly engineerService: EngineerService,
+    private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateEngineer(login: string, pass: string): Promise<any> {
-    const engineer = await this.engineerService.findByLogin(login);
-    if (engineer) {
-      const isMatchPasswords = await bcrypt.compare(pass, engineer.password);
+  async validateUser(login: string, pass: string): Promise<any> {
+    const user = await this.userService.findByLogin(login);
+    if (user) {
+      const isMatchPasswords = await bcrypt.compare(pass, user.password);
       if (!isMatchPasswords) {
         return null;
       }
-      const { password, ...result } = engineer;
+      const { password, ...result } = user;
       return result;
     }
     return null;
   }
 
-  async login(engineer: any) {
-    const payload = { login: engineer.login, sub: engineer.id };
+  async login(user: any) {
+    const payload = { login: user.login, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };

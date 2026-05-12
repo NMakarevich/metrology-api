@@ -1,9 +1,9 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateEngineerDto } from './create-engineer.dto';
+import { CreateUserDto } from './create-user.dto';
 import { IsEnum, IsOptional, IsString, MinLength, ValidateIf } from 'class-validator';
 import { Role } from '../../../../generated/prisma/enums';
 
-export class UpdateEngineerDto extends PartialType(CreateEngineerDto) {
+export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsOptional()
   @IsString()
   @MinLength(2, { message: 'First name must be at least 2 characters' })

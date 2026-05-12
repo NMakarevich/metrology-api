@@ -26,14 +26,14 @@ export class NoteController {
   @HttpCode(HttpStatus.CREATED)
   @Post()
   create(@Body() createNoteDto: CreateNoteDto, @Headers('Authorization') authorization: string) {
-    const engineerId = this.extractEngineerIdFromToken(authorization);
-    return this.noteService.create(createNoteDto, engineerId);
+    const userId = this.extractUserIdFromToken(authorization);
+    return this.noteService.create(createNoteDto, userId);
   }
 
   @Get()
   findAll(@Headers('Authorization') authorization: string) {
-    const engineerId = this.extractEngineerIdFromToken(authorization);
-    return this.noteService.findAll(engineerId);
+    const userId = this.extractUserIdFromToken(authorization);
+    return this.noteService.findAll(userId);
   }
 
   @Get(':id')
@@ -47,8 +47,8 @@ export class NoteController {
     @Body() updateNoteDto: UpdateNoteDto,
     @Headers('Authorization') authorization: string,
   ) {
-    const engineerId = this.extractEngineerIdFromToken(authorization);
-    return this.noteService.update(id, updateNoteDto, engineerId);
+    const userId = this.extractUserIdFromToken(authorization);
+    return this.noteService.update(id, updateNoteDto, userId);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -57,7 +57,7 @@ export class NoteController {
     return this.noteService.remove(id);
   }
 
-  private extractEngineerIdFromToken(authorization: string) {
+  private extractUserIdFromToken(authorization: string) {
     const token = authorization.split('Bearer ')[1];
     const { sub } = this.jwt.verify(token);
     return sub;

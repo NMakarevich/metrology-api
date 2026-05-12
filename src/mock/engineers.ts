@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { Role } from '../../generated/prisma/enums';
-import { Engineer } from '../resources/engineer/entities/engineer.entity';
+import { User } from '../resources/user/entities/user.entity';
 
 @Injectable()
 export class EngineersDB {
-  engineers: Engineer[] = [
-    new Engineer({
+  engineers: User[] = [
+    new User({
       firstName: 'Nikolai',
       lastName: 'Makarevich',
       login: 'makarevichna',
@@ -18,7 +18,7 @@ export class EngineersDB {
       version: 1,
       role: Role.ADMIN,
     }),
-    new Engineer({
+    new User({
       firstName: 'Nikolai',
       lastName: 'Makarevich',
       login: 'makarevichna1',
@@ -32,7 +32,7 @@ export class EngineersDB {
     }),
   ];
 
-  create(engineer: Engineer) {
+  create(engineer: User) {
     this.engineers.push(engineer);
     return engineer;
   }
@@ -49,7 +49,7 @@ export class EngineersDB {
     return this.engineers.find(({ login }) => login === engineerLogin);
   }
 
-  update(engineerId: string, updatedEngineer: Engineer) {
+  update(engineerId: string, updatedEngineer: User) {
     const engineer = this.engineers.find(({ id }) => id === engineerId);
     return Object.assign(engineer, updatedEngineer);
   }

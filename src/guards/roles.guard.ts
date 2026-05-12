@@ -9,7 +9,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Role } from '../../generated/prisma/enums';
-import { EngineerService } from '../resources/engineer/engineer.service';
+import { UserService } from '../resources/user/user.service';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import 'dotenv/config';
 import * as process from 'node:process';
@@ -19,7 +19,7 @@ import { DEFAULT_JWT_SECRET } from '../resources/auth/constants';
 export class RolesGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private readonly engineerService: EngineerService,
+    private readonly userService: UserService,
     private readonly jwt: JwtService,
   ) {}
 
@@ -36,14 +36,14 @@ export class RolesGuard implements CanActivate {
     const { method, url } = context.switchToHttp().getRequest();
 
     try {
-      const engineer = await this.engineerService.findOne(id);
-      if (url.includes('engineer') && (method === 'PATCH' || method === 'DELETE')) {
-        const engineerId = url.split('/').pop();
-        const targetEngineer = await this.engineerService.findOne(engineerId);
-        if (engineer.role === Role.ENGINEER) return targetEngineer.role === Role.ENGINEER;
+      const user = await this.userService.findOne(id);
+      if (url.includes('user') && (method === 'PATCH' || method === 'DELETE')) {
+        const userId = url.split('/').pop();
+        const targetUser = await this.userService.findOne(userId);
+        if (user.role === Role.ENGINEER) return targetUser.role === Role.ENGINEER;
         else return true;
       }
-      return requiredRoles.includes(engineer.role);
+      return requiredRoles.includes(user.role);
     } catch (error: unknown) {
       if (error instanceof HttpException) {
         if (error.getStatus() === HttpStatus.NOT_FOUND) {
