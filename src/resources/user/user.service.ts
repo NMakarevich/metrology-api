@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -8,12 +8,17 @@ import * as process from 'node:process';
 import { DEFAULT_SALT_OR_ROUNDS } from './constants';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Role } from '../../../generated/prisma/enums';
+import { DEFAULT_JWT_SECRET } from '../auth/constants';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 
 const BCRYPT_SALT = Number(process.env.SALT_OR_ROUNDS ?? DEFAULT_SALT_OR_ROUNDS);
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly jwt: JwtService,
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     const hash = await bcrypt.hash(createUserDto.password, BCRYPT_SALT);
@@ -58,6 +63,11 @@ export class UserService {
     });
   }
 
+  async getProfile(authorization: string) {
+    const userId = await this.extractId(authorization);
+    return this.prismaService.user.findUnique({ where: { id: userId }, omit: { password: true } });
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto, authorization: string) {
     if (updateUserDto.login) {
       const user = await this.findByLogin(updateUserDto.login);
@@ -88,5 +98,19 @@ export class UserService {
 
   remove(id: string) {
     return this.prismaService.user.delete({ where: { id } });
+  }
+
+  private async extractId(authorization: string) {
+    const token = authorization.replace('Bearer ', '');
+    try {
+      const { sub } = await this.jwt.verify(token, {
+        secret: process.env.JWT_SECRET ?? DEFAULT_JWT_SECRET,
+      });
+      return sub;
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        throw new UnauthorizedException();
+      }
+    }
   }
 }

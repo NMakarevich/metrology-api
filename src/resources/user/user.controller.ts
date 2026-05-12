@@ -32,11 +32,18 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @Get('/profile')
+  async profile(@Headers('Authorization') authorization: string): Promise<Omit<User, 'password'>> {
+    return this.userService.getProfile(authorization);
+  }
+
+  @Roles(Role.ADMIN)
   @Get()
   async findAll(): Promise<Omit<User, 'password'>[]> {
     return this.userService.findAll();
   }
 
+  @Roles(Role.ADMIN)
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<Omit<User, 'password'>> {
     return this.userService.findOne(id);
