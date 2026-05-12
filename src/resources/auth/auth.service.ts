@@ -18,8 +18,8 @@ export class AuthService {
       if (!isMatchPasswords) {
         return null;
       }
-      const { password, ...result } = user;
-      return result;
+      delete user.password;
+      return user;
     }
     return null;
   }
