@@ -82,11 +82,18 @@ export class UserService {
         throw new HttpException('Incorrect password', HttpStatus.UNAUTHORIZED);
       }
     }
-    const hash = await bcrypt.hash(updateUserDto.newPassword, BCRYPT_SALT);
-    const updatedUser = Object.assign(user, updateUserDto, {
-      updatedBy: authorization,
-      password: hash,
-    });
+    const hash = updateUserDto.oldPassword
+      ? await bcrypt.hash(updateUserDto.newPassword, BCRYPT_SALT)
+      : null;
+    delete updateUserDto.oldPassword;
+    delete updateUserDto.newPassword;
+    const updatedUser = Object.assign(
+      user,
+      { ...updateUserDto, ...(hash && { password: hash }) },
+      {
+        updatedBy: authorization,
+      },
+    );
     return this.prismaService.user.update({
       where: { id },
       data: { ...updatedUser, version: { increment: 1 } },

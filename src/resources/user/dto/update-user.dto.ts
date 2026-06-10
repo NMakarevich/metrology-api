@@ -17,13 +17,13 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsString()
   @IsOptional()
   @ValidateIf((o) => o.newPassword)
-  @MinLength(6, { message: 'Password must be at least 6 characters' })
+  @MinLength(8, { message: 'Password must be at least 8 characters' })
   oldPassword: string;
 
   @IsString()
   @IsOptional()
   @ValidateIf((o) => o.oldPassword)
-  @MinLength(6, { message: 'Password must be at least 6 characters' })
+  @MinLength(8, { message: 'Password must be at least 8 characters' })
   newPassword: string;
 
   @IsOptional()
