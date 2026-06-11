@@ -134,7 +134,6 @@ export class UserService {
         throw new HttpException('Incorrect password', HttpStatus.UNAUTHORIZED);
       }
     }
-    console.log(updateUserDto);
     const hash = updateUserDto.oldPassword
       ? await bcrypt.hash(updateUserDto.newPassword, BCRYPT_SALT)
       : null;
