@@ -1,29 +1,24 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
-import { IsEnum, IsOptional, IsString, MinLength, ValidateIf } from 'class-validator';
+import { IsEnum, IsOptional, IsString, Matches, MinLength, ValidateIf } from 'class-validator';
 import { Role } from '../../../../generated/prisma/enums';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
-  @IsOptional()
-  @IsString()
-  @MinLength(2, { message: 'First name must be at least 2 characters' })
-  firstName: string;
-
-  @IsOptional()
-  @IsString()
-  @MinLength(2, { message: 'Last name must be at least 2 characters' })
-  lastName: string;
-
   @IsString()
   @IsOptional()
   @ValidateIf((o) => o.newPassword)
-  @MinLength(8, { message: 'Password must be at least 8 characters' })
   oldPassword: string;
 
   @IsString()
   @IsOptional()
   @ValidateIf((o) => o.oldPassword)
-  @MinLength(8, { message: 'Password must be at least 8 characters' })
+  @MinLength(8, { message: 'Пароль должен состоять минимум из 8 символов' })
+  @Matches(/[A-ZА-Я]/g, { message: 'Пароль должен содержать как минимум одну заглавную букву' })
+  @Matches(/[a-zа-я]/g, { message: 'Пароль должен содержать как минимум одну строчную букву' })
+  @Matches(/[0-9]/g, { message: 'Пароль должен содержать как минимум одну цифру' })
+  @Matches(/[!@#$%^&*()_+=;:,.?`"'\\/|~{}[\]]/gm, {
+    message: 'Пароль должен содержать как минимум один специальный символ',
+  })
   newPassword: string;
 
   @IsOptional()
