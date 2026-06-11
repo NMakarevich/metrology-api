@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import 'dotenv/config';
 import * as process from 'node:process';
@@ -10,6 +9,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { Role } from '../../../generated/prisma/enums';
 import { DEFAULT_JWT_SECRET } from '../auth/constants';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { User } from './entities/user.entity';
 
 const BCRYPT_SALT = Number(process.env.SALT_OR_ROUNDS ?? DEFAULT_SALT_OR_ROUNDS);
 
@@ -20,27 +20,53 @@ export class UserService {
     private readonly jwt: JwtService,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto, authorization?: string) {
     const hash = await bcrypt.hash(createUserDto.password, BCRYPT_SALT);
     const users = await this.findAll();
 
     const newUser = new User(
       Object.assign({}, createUserDto, {
         password: hash,
-        updatedBy: '',
         role: users.length === 0 ? Role.ADMIN : Role.ENGINEER,
+        createdById: null,
+        updatedById: null,
       }),
     );
-    return this.prismaService.user.create({
-      data: newUser,
-      omit: {
-        password: true,
-      },
-    });
+
+    if (authorization) {
+      const createdBy = await this.extractId(authorization);
+      return this.prismaService.user.create({
+        data: { ...newUser, createdBy: { connect: { id: createdBy } } },
+        omit: {
+          password: true,
+        },
+      });
+    } else {
+      return this.prismaService.user.create({
+        data: newUser,
+        omit: { password: true },
+      });
+    }
   }
 
   findAll() {
     return this.prismaService.user.findMany({
+      include: {
+        createdBy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        updatedBy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
       omit: {
         password: true,
       },
@@ -50,6 +76,15 @@ export class UserService {
   async findOne(id: string) {
     const user = await this.prismaService.user.findUnique({
       where: { id },
+      include: {
+        createdBy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
     });
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -65,7 +100,19 @@ export class UserService {
 
   async getProfile(authorization: string) {
     const userId = await this.extractId(authorization);
-    return this.prismaService.user.findUnique({ where: { id: userId }, omit: { password: true } });
+    return this.prismaService.user.findUnique({
+      where: { id: userId },
+      include: {
+        createdBy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+      omit: { password: true },
+    });
   }
 
   async update(id: string, updateUserDto: UpdateUserDto, authorization: string) {
@@ -82,14 +129,29 @@ export class UserService {
         throw new HttpException('Incorrect password', HttpStatus.UNAUTHORIZED);
       }
     }
-    const hash = await bcrypt.hash(updateUserDto.newPassword, BCRYPT_SALT);
-    const updatedUser = Object.assign(user, updateUserDto, {
-      updatedBy: authorization,
-      password: hash,
-    });
+    const hash = updateUserDto.oldPassword
+      ? await bcrypt.hash(updateUserDto.newPassword, BCRYPT_SALT)
+      : null;
+    delete updateUserDto.oldPassword;
+    delete updateUserDto.newPassword;
+    const updatedBy = await this.extractId(authorization);
+    const updatedUser = Object.assign({ ...updateUserDto, ...(hash && { password: hash }) });
     return this.prismaService.user.update({
       where: { id },
-      data: { ...updatedUser, version: { increment: 1 } },
+      data: {
+        ...updatedUser,
+        version: { increment: 1 },
+        updatedBy: { connect: { id: updatedBy } },
+      },
+      include: {
+        createdBy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
       omit: {
         password: true,
       },

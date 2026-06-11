@@ -14,7 +14,6 @@ export class User {
 
   createdAt: string | Date;
   updatedAt: string | Date;
-  updatedBy: string | null;
   version: number;
 
   constructor(partial: Partial<User>) {
