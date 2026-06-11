@@ -28,8 +28,11 @@ export class UserController {
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  async create(
+    @Headers('Authorization') authorization: string,
+    @Body() createUserDto: CreateUserDto,
+  ) {
+    return this.userService.create(createUserDto, authorization);
   }
 
   @Get('/profile')
