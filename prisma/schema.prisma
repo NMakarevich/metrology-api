@@ -25,7 +25,7 @@ model User {
   createdById  String?  @unique
   createdBy    User?    @relation("CreatorUser", fields: [createdById], references: [id])
   role         Role
-  updatedById  String?  @unique
+  updatedById  String?
   updatedBy    User?    @relation("UpdatorUser", fields: [updatedById], references: [id])
   version      Int      @default(1)
   Note         Note[]
