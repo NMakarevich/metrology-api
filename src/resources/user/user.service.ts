@@ -42,8 +42,13 @@ export class UserService {
         },
       });
     } else {
-      return this.prismaService.user.create({
+      const user = await this.prismaService.user.create({
         data: newUser,
+        omit: { password: true },
+      });
+      return this.prismaService.user.update({
+        where: { id: user.id },
+        data: { createdBy: { connect: { id: user.id } } },
         omit: { password: true },
       });
     }
@@ -129,6 +134,7 @@ export class UserService {
         throw new HttpException('Incorrect password', HttpStatus.UNAUTHORIZED);
       }
     }
+    console.log(updateUserDto);
     const hash = updateUserDto.oldPassword
       ? await bcrypt.hash(updateUserDto.newPassword, BCRYPT_SALT)
       : null;
