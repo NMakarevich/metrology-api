@@ -11,6 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.use(LoggerMiddleware);
+  app.setGlobalPrefix('api');
   const port = Number(process.env.PORT ?? 4100);
   app.enableCors();
 
