@@ -11,6 +11,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -19,6 +20,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from '../../decorators/roles.decorator';
 import { User } from './entities/user.entity';
 import { Role } from '../../../generated/prisma/enums';
+import { Public } from '../../decorators/public.decorator';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('user')
@@ -44,6 +46,13 @@ export class UserController {
   @Get()
   async findAll(): Promise<Omit<User, 'password'>[]> {
     return this.userService.findAll();
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Get('/check')
+  async checkLogin(@Query('login') login: string) {
+    return this.userService.checkLogin(login);
   }
 
   @Roles(Role.ADMIN)

@@ -103,6 +103,15 @@ export class UserService {
     });
   }
 
+  async checkLogin(login: string) {
+    const user = await this.findByLogin(login);
+    if (!user) {
+      return;
+    } else {
+      throw new HttpException('User with entered login is exist', HttpStatus.CONFLICT);
+    }
+  }
+
   async getProfile(authorization: string) {
     const userId = await this.extractId(authorization);
     return this.prismaService.user.findUnique({
@@ -121,15 +130,15 @@ export class UserService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto, authorization: string) {
+    const userToUpdate = await this.findOne(id);
     if (updateUserDto.login) {
       const user = await this.findByLogin(updateUserDto.login);
-      if (user) {
+      if (user && user.login !== userToUpdate.login) {
         throw new HttpException('User with entered login is exist', HttpStatus.CONFLICT);
       }
     }
-    const user = await this.findOne(id);
     if (updateUserDto.oldPassword) {
-      const isMatch = await bcrypt.compare(updateUserDto.oldPassword, user.password);
+      const isMatch = await bcrypt.compare(updateUserDto.oldPassword, userToUpdate.password);
       if (!isMatch) {
         throw new HttpException('Incorrect password', HttpStatus.UNAUTHORIZED);
       }
