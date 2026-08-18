@@ -1,0 +1,168 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client"
+  output          = "../generated/prisma"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  firstName    String
+  lastName     String
+  login        String   @unique
+  password     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdById  String?  @unique
+  createdBy    User?    @relation("CreatorUser", fields: [createdById], references: [id])
+  role         Role
+  updatedById  String?
+  updatedBy    User?    @relation("UpdatorUser", fields: [updatedById], references: [id])
+  version      Int      @default(1)
+  Note         Note[]
+  usersUpdated User[]   @relation("UpdatorUser")
+  usersCreated User[]   @relation("CreatorUser")
+}
+
+enum Role {
+  ADMIN
+  ENGINEER
+}
+
+model Address {
+  id      String   @id @default(uuid())
+  address String
+  clinics Clinic[]
+}
+
+model Clinic {
+  id          String       @id @default(uuid())
+  name        String
+  address     Address      @relation(fields: [addressId], references: [id])
+  addressId   String
+  contacts    Contact[]
+  categories  Category[]
+  instruments Instrument[]
+}
+
+model Contact {
+  id       String  @id @default(uuid())
+  fullName String
+  role     String
+  phone    String?
+  email    String?
+  clinicId String?
+  clinic   Clinic? @relation(fields: [clinicId], references: [id])
+}
+
+model Category {
+  id                 String               @id @default(uuid())
+  name               String
+  clinics            Clinic[]
+  vendors            Vendor[]
+  models             Model[]
+  instruments        Instrument[]
+  Verification       Verification[]
+  planningCategories PlanningCategories[]
+}
+
+model Vendor {
+  id         String    @id @default(uuid())
+  name       String
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+  models     Model[]
+}
+
+model Model {
+  id              String       @id @default(uuid())
+  name            String
+  registryNumber  String
+  registryName    String
+  validationPrice Float
+  vendor          Vendor?      @relation(fields: [vendorId], references: [id])
+  vendorId        String?
+  category        Category?    @relation(fields: [categoryId], references: [id])
+  categoryId      String?
+  instruments     Instrument[]
+}
+
+model Instrument {
+  id                   String              @id @default(uuid())
+  serialNumber         String
+  verifiedAt           DateTime
+  validUntil           DateTime
+  status               Status
+  comment              String              @default("")
+  clinicId             String?
+  clinic               Clinic?             @relation(fields: [clinicId], references: [id])
+  categoryId           String?
+  category             Category?           @relation(fields: [categoryId], references: [id])
+  modelId              String?
+  model                Model?              @relation(fields: [modelId], references: [id])
+  verificationId       String?
+  verification         Verification?       @relation(fields: [verificationId], references: [id])
+  planningCategories   PlanningCategories? @relation(fields: [planningCategoriesId], references: [id])
+  planningCategoriesId String?
+}
+
+enum Status {
+  VALID
+  PREPARE_TO_VALIDATION
+  IN_VALIDATION
+  LOST
+  INVALID
+  CANCELED
+}
+
+model Note {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      String?
+}
+
+model Verification {
+  id          String              @id @default(uuid())
+  account     Float?
+  accountId   String?
+  date        DateTime            @default(now())
+  category    Category?           @relation(fields: [categoryId], references: [id])
+  categoryId  String?
+  instruments Instrument[]
+  status      VerificationStatus? @default(READY_TO_VALIDATION)
+}
+
+enum VerificationStatus {
+  READY_TO_VALIDATION
+  IN_VALIDATION
+  PAID
+  DONE
+}
+
+model Planning {
+  year       Int                  @id @unique
+  categories PlanningCategories[]
+}
+
+model PlanningCategories {
+  id           String       @id @default(uuid())
+  month        Int
+  categoryId   String?
+  category     Category?    @relation(fields: [categoryId], references: [id])
+  instruments  Instrument[]
+  planning     Planning?    @relation(fields: [planningYear], references: [year])
+  planningYear Int?
+}
